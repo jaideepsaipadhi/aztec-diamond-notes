@@ -30,7 +30,9 @@ a clone of `github.com/nikolaibobenko/FockDimerSimulation`.
 - `schottky_full.py` — period matrices by Poincaré series over double cosets
 - `test_vs_jtem.py`, `Reference.java` — regression fixture against jtem
 - `poincare_map.py` — map of where the series is usable
-- `genus2.py`, `genus2_amoeba.py`, `sigma_g2.py` — the genus-2 attempt
+- `genus2.py`, `genus2_amoeba.py`, `sigma_g2.py` — genus-2 curve, amoeba, sigma
+- `genus2_fock.py` — genus-2 Fock face weights via BBS (10); the prime form's
+  spinors cancel in the face weight, leaving only theta with odd characteristic
 - `bn_model.py` — the general `k × l` model of [BN] Definition 2.1
 
 ## Limit shapes (§4)

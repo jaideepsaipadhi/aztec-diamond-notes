@@ -273,10 +273,36 @@ At `n = 96` the measurement is `(0.4723 ± 0.0009, 0.5165 ± 0.0012)` against th
 predicted `(0.4716546, 0.5170360)`. The prediction comes from the Schottky data
 with no simulation anywhere in its derivation.
 
-A genus-2 version works as far as the polygon map (two distinct facet slopes,
-`Im ζ` constant on each oval to `10⁻⁶`), but the facets occupy only 1–3% of the
-limit shape for every configuration inside the region where I can check the
-period matrix against Bobenko's `jtem` code, so I have not pushed it further.
+**Genus 2.** The same construction carries over and has also been checked
+against sampling. Two distinct gas facets are predicted from the Schottky data
+through the polygon map, and both are found in a sampled Fock-weighted
+configuration at `n = 96`:
+
+| | predicted | measured | distance |
+|---|---|---|---|
+| facet 1 | (0.1204, 0.2541) | (0.1354, 0.2674) | 0.0200 |
+| facet 2 | (0.7465, 0.8807) | (0.7412, 0.8745) | 0.0082 |
+
+(The Newton polygon is only defined up to translation; the predicted values are
+shifted by `(+1, 0)` into the frame of the measurement.)
+
+Two things make this tractable. The Schottky–Klein prime form, which the edge
+weight needs, requires holomorphic spinors — but in the *face* weight (10) each
+train-track point occurs once in a numerator and once in a denominator, so the
+spinors cancel and only `θ[Δ]` with an odd characteristic survives, a lattice
+sum over `ℤ²`. And `θ` is 1-periodic in each component, so the face weight
+depends on the discrete Abel map only through `η mod 1`, giving a 2D lookup
+accurate to `6 × 10⁻⁵`.
+
+Checks: all six odd characteristics vanish at `0` to `10⁻²¹`; the train-track
+factor of (10) is real to `4.4 × 10⁻¹⁵` (the M-curve prediction, and not forced
+by the computation); the face weights are real to `10⁻¹⁵`.
+
+The facets are small — 1–3% of the limit shape for every configuration inside
+the region where the period matrix can be checked against Bobenko's `jtem` code
+— which is why the measurement is at the `10⁻²` level rather than `10⁻⁴`.
+
+Code: `genus2_fock.py`, `genus2_amoeba.py`.
 
 ---
 
