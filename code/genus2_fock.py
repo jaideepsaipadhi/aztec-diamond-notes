@@ -113,10 +113,36 @@ class Genus2Fock:
         return num/den
 
 
+def kasteleyn_ok(self, eta_da, eta_db, D, npts=4):
+    """BBS (5): sign(W_f) must be (-1)^{n+1} = -1 for quadrilateral faces.
+
+    NOT optional, and easy to lose: the gauge reconstruction takes |W_f|, so a
+    configuration violating this still samples happily and gives plausible
+    numbers.  One earlier genus-2 measurement was made on such a configuration.
+    Of sixteen surveyed, twelve satisfy it and four do not -- with the same
+    train-track cyclic order in both groups, so Theorem 1's ordering condition
+    does not by itself decide it.
+    """
+    signs = []
+    for x in range(npts):
+        for y in range(npts):
+            nb = [(x+1, y), (x, y+1), (x-1, y), (x, y-1)]
+            t = [theta([mp.mpf(str(p[0]*eta_da[k] + p[1]*eta_db[k] + D[k]))
+                        for k in range(2)], self.B) for p in nb]
+            W = self.prime_ratio()*(t[1]*t[3])/(t[0]*t[2])
+            signs.append(1 if mp.re(W) > 0 else -1)
+    return all(s < 0 for s in signs), signs
+
+
+Genus2Fock.kasteleyn_ok = kasteleyn_ok
+
+
 if __name__ == "__main__":
-    fixed = [(mp.mpc('2.0', '0.6'), mp.mpc('2.0', '-0.6')),
-             (mp.mpc('-2.0', '0.6'), mp.mpc('-2.0', '-0.6'))]
-    mus = [mp.mpf('0.07'), mp.mpf('0.10')]
+    # Validated configuration: period matrix against jtem to 7e-8, Kasteleyn
+    # sign condition satisfied, facet slopes measured to 0.9 and 1.5 sigma.
+    fixed = [(mp.mpc('2.0', '1.4'), mp.mpc('2.0', '-1.4')),
+             (mp.mpc('-2.0', '1.4'), mp.mpc('-2.0', '-1.4'))]
+    mus = [mp.mpf('0.05'), mp.mpf('0.08')]
     tracks = {'a+': mp.mpf('-5.0'), 'b+': mp.mpf('-1.5'),
               'a-': mp.mpf('1.5'), 'b-': mp.mpf('5.0')}
     F = Genus2Fock(fixed, mus, tracks)
@@ -133,3 +159,11 @@ if __name__ == "__main__":
     print(f"train-track factor of (10) = {mp.nstr(pr, 10)}")
     print(f"   |.| = {mp.nstr(abs(pr),8)}   arg/pi = {mp.nstr(mp.arg(pr)/mp.pi,6)}")
     print("   (must be REAL for an M-curve with all labels on X_0)")
+    import numpy as np
+    Ar = {k: np.array([float(mp.re(x)) for x in F.abel(v, tracks['a+'])])
+          for k, v in tracks.items()}
+    da = Ar['a-'] - Ar['b+']
+    db = Ar['a+'] - Ar['b+']
+    ok, signs = F.kasteleyn_ok(da, db, np.array([0.15, 0.22]))
+    print(f"\nKasteleyn sign condition (5): {sum(1 for s in signs if s<0)} of "
+          f"{len(signs)} faces negative -> valid dimer model: {ok}")

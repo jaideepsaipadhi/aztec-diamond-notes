@@ -276,31 +276,44 @@ with no simulation anywhere in its derivation.
 **Genus 2.** The same construction carries over and has also been checked
 against sampling. Two distinct gas facets are predicted from the Schottky data
 through the polygon map, and both are found in a sampled Fock-weighted
-configuration at `n = 96`:
+configuration at `n = 96` with 20 samples:
 
 | | predicted | measured | distance |
 |---|---|---|---|
-| facet 1 | (0.1204, 0.2541) | (0.1354, 0.2674) | 0.0200 |
-| facet 2 | (0.7465, 0.8807) | (0.7412, 0.8745) | 0.0082 |
+| facet 1 | (0.2738, 0.3417) | (0.2811 ± 0.0076, 0.3378 ± 0.0061) | 0.0084 (0.9σ) |
+| facet 2 | (0.6633, 0.7312) | (0.6499 ± 0.0084, 0.7195 ± 0.0085) | 0.0178 (1.5σ) |
 
 (The Newton polygon is only defined up to translation; the predicted values are
 shifted by `(+1, 0)` into the frame of the measurement.)
 
-Two things make this tractable. The Schottky–Klein prime form, which the edge
-weight needs, requires holomorphic spinors — but in the *face* weight (10) each
-train-track point occurs once in a numerator and once in a denominator, so the
-spinors cancel and only `θ[Δ]` with an odd characteristic survives, a lattice
-sum over `ℤ²`. And `θ` is 1-periodic in each component, so the face weight
-depends on the discrete Abel map only through `η mod 1`, giving a 2D lookup
-accurate to `6 × 10⁻⁵`.
+The configuration is checked three ways: the period matrix against Bobenko's
+`jtem` code to `7 × 10⁻⁸`; the Kasteleyn sign condition (5) satisfied at every
+face; and the facet slopes above.
 
-Checks: all six odd characteristics vanish at `0` to `10⁻²¹`; the train-track
-factor of (10) is real to `4.4 × 10⁻¹⁵` (the M-curve prediction, and not forced
-by the computation); the face weights are real to `10⁻¹⁵`.
+**The sign condition is not optional and is easy to lose.** Equation (5)
+requires `sign(W_f) = (−1)^{n+1}`, so `−1` for quadrilateral faces. An earlier
+version of this measurement used Harnack data whose face weights came out all
+*positive* — not a dimer model at all — and the gauge reconstruction takes
+`|W_f|`, so the sampler ran happily and produced plausible numbers. It surfaced
+only because changing `Im A` flipped the sign. Of sixteen configurations
+surveyed, twelve satisfy the condition and four do not, with the same
+train-track cyclic order in both groups, so the ordering condition of Theorem 1
+does not by itself decide it.
 
-The facets are small — 1–3% of the limit shape for every configuration inside
-the region where the period matrix can be checked against Bobenko's `jtem` code
-— which is why the measurement is at the `10⁻²` level rather than `10⁻⁴`.
+Two things make the genus-2 case tractable. The Schottky–Klein prime form,
+which the *edge* weight needs, requires holomorphic spinors — but in the *face*
+weight (10) each train-track point occurs once in a numerator and once in a
+denominator, so the spinors cancel and only `θ[Δ]` with an odd characteristic
+survives, a lattice sum over `ℤ²`. And `θ` is 1-periodic in each component, so
+the face weight depends on the discrete Abel map only through `η mod 1`, giving
+a 2D lookup accurate to `6 × 10⁻⁵`.
+
+Checks on the machinery: all six odd characteristics vanish at `0` to `10⁻²¹`;
+the train-track factor of (10) is real to `4 × 10⁻¹⁵` (the M-curve prediction,
+and not forced by the computation); the face weights are real to `10⁻¹⁵`.
+
+The facets occupy a few percent of the limit shape, which is why the agreement
+is at the `10⁻²` level rather than `10⁻⁴`.
 
 Code: `genus2_fock.py`, `genus2_amoeba.py`.
 
