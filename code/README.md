@@ -17,8 +17,20 @@ a clone of `github.com/nikolaibobenko/FockDimerSimulation`.
 - `height.py` — Thurston height; zero violated edges, zero face circulation
 - `exactdist.py`, `alignments.py`, `gasvar.py` — supporting checks
 - `gasgibbs.py` — full-plane gas Gibbs measure from the spectral curve
-- `sample_discrete.py` — **the same measurement by sampling at n = 192**, past
-  the determinant method's ceiling (NOTES.md §3.4)
+- `sample_discrete.py` — the same measurement by sampling at n = 192, past the
+  determinant method's ceiling (NOTES.md §3.4). **The observable is wrong** — it
+  reads the height at one face, which is the discrete component plus the local
+  gas fluctuation, and that is where the retracted factor of 2 came from. Kept
+  because the sampling machinery is correct and still used.
+
+## The discrete component, done right (§3.6)
+- `spatial_avg.py` — **the correct observable**: the spatial average of the
+  height over the gas facet, as one precomputed dot product per sample. Verified
+  against a direct BFS height on every run
+- `align_avg.py` — the four alignments of Remark 4.18; measured shifts
+  `{1/4, 3/4, 1/2, 0}`
+- `half_scaling.py` — finite-`n` behaviour of the `e = 1/2` alignment, where two
+  atoms must carry exactly equal mass for any `b`
 
 ## Samplers
 - `genshuffle.py` — generalised shuffling (Janvresse–de la Rue–Velenik)
@@ -53,6 +65,34 @@ a clone of `github.com/nikolaibobenko/FockDimerSimulation`.
 - `fock_sample.py` — sampling and facet-slope measurement
 - `endtoend.py`, `fockweights.py` — superseded; `fockweights.face_weight` is
   **wrong** (see NOTES.md §4) and is kept only so the history is legible
+
+## Genus 3: the period matrix and its off-diagonal entries (§5)
+- `periodic_dimer.py` — a periodic Aztec diamond from its OWN Kasteleyn matrix:
+  in diagonal coordinates the graph is the square lattice, so `P(z,w) = det K`,
+  the Newton polygon and the amoeba follow directly. No `α/β/γ` dictionary
+- `hyper_curve.py` — the hyperelliptic curve `y² = D(z)` and its real branch
+  points, with the quadratic-in-`w` coefficients recovered at full precision
+- `hyper_g3.py` — **the period matrix**, with the three errors genus 1 cannot
+  detect fixed and documented: `ℬ𝒜⁻¹` (not `𝒜⁻¹ℬ`), the alternating branch
+  phases, and `B − Bᵀ` integral rather than zero. Self-checks: homology
+  relations, symmetry, `Im B ≻ 0`, and the genus-1 value to `2×10⁻¹³`
+- `g3_sample.py` — sampler for `(2,4)`-periodic weights (full descent; the
+  two-periodic torsion shortcut does not apply). Validated against exact
+  Kasteleyn edge probabilities
+- `g3_measure.py` — facets located from the five slope plateaus of the mean
+  height; the joint distribution of the three facet shifts
+- `g3_erode.py` — erosion sweep of the facet mask, the valid mask-contamination
+  test (conditioning on rounding residual is not — it selects configurations)
+- `g3_swap.py` — **the falsification test**: a period matrix from different
+  weights, given all six labellings and its own free shifts, rejected by
+  `Δ(−log L) = 208`
+- `g3_tune2.py`, `g3_asym2.py`, `hole_tune.py` — weight selection against the
+  tension between facet size and measurable atoms
+- `amoeba_holes.py` — symmetry-free hole finder. `hole_tune.py` locates holes by
+  distance from `r₂ = 0`, valid only when `C = A`, i.e. only for the symmetric
+  weight family; breaking that symmetry makes it report zero holes for a model
+  that has three
+- `g3_best_weights.npy`, `g3_best_ImB.npy`, `g3c_*.npy` — the two configurations
 
 ## Contour formula (incomplete — see NOTES.md §3.4)
 - `exactinv.py`, `fastinv.py`, `gasinv.py` — reproduces the matrix inverse to

@@ -1,6 +1,32 @@
 """
 The discrete component by SAMPLING, at n = 192 (NOTES.md section 3.4).
 
+*** SUPERSEDED BY spatial_avg.py -- THE OBSERVABLE HERE IS WRONG. ***
+
+This measures the height at ONE face of the gas facet, which is the discrete
+component PLUS the local gas fluctuation at that face.  That fluctuation is
+nearly symmetric with mass ~0.05-0.11 per side, so it fills in the P(-1) atom the
+true discrete component does not have and inflates P(+1); the result imitates a
+discrete Gaussian of scale 2b.  That is the entire "factor of 2" reported in the
+first version of NOTES.md section 3.3.
+
+The correct observable is a SPATIAL AVERAGE of the height over the facet: the
+discrete component is a rigid shift of the whole facet and survives averaging,
+the local fluctuation does not.  See spatial_avg.py, and NOTES.md section 3.6.
+
+At a = 0.7, n = 192, the two observables give:
+
+                    this file      spatial_avg.py     Cor. 4.17, e = 1/4
+    P(+1)/P(0)        0.1229      0.12728 +- 0.00461      0.130972
+    P(-1)/P(0)        0.1323      0.00226 +- 0.00065      0.002247
+
+The file is kept because the machinery below is still correct and still used --
+the shuffling sampler removes the n ~ 60 conditioning ceiling of the determinant
+route, and spatial_avg.py is built on it.  Only the choice of observable (a
+single dual path, via conditioned.path_edges) is wrong.
+
+--- original header follows ---
+
 The determinant route (conditioned.py) gives the exact distribution but is capped
 at n ~ 60: cond(K) ~ 10^(0.252 n), because the frozen corners' deterministic
 matchings produce exponentially small singular values.
@@ -8,9 +34,6 @@ matchings produce exponentially small singular values.
 But the discrete component does not need a determinant.  It is a signed count of
 matching edges crossing the dual path, so on a sampled configuration it is one
 dot product.  Sampling involves no matrix at all, so there is no ceiling.
-
-At a = 0.7 this measures the disputed parameter directly, rather than carrying it
-from small a by the functional form.
 
 Cost on one core: ~91 s to build the shuffling levels (one-time per size and
 weight set), then ~32 ms per sample.
