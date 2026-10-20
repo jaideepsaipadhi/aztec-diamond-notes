@@ -42,11 +42,14 @@ Aztec dimer model* (arXiv:2502.07241), cited as [BN].
 5. **The quasi-periodic dependence on `N`, demonstrated (§6).** The shift
    velocity `v` of equation (19) is identified as `−2 u(0₊)`, computed from the
    spectral curve at 40 digits, and found to agree with an independent
-   Monte-Carlo measurement inside 1σ on all three components for each of two
-   weight configurations. Its continued fraction has only ordinary partial
-   quotients, so `v` is irrational and the orbit never closes. The genus-1 case
-   is 4-torsion — `v = 1/4` to 22 digits — which is why §4.6 of the paper, the
-   one worked example, is periodic and shows none of this.
+   Monte-Carlo measurement: all three components of configuration A
+   (`χ² = 2.6` on 3 dof) and both labelling-invariant channels of configuration
+   C. Its continued fraction has only ordinary partial quotients, so `v` is
+   irrational and the orbit never closes. The genus-1 case is 4-torsion —
+   `v = 1/4` to 22 digits — which is why §4.6 of the paper, the one worked
+   example, is periodic and shows none of this. The measurement requires an
+   `n`-parity term that pure linear advance omits (§6.1); without it the
+   residuals are not noise but a near-perfect alternation, `ρ = −0.997`.
 
 Findings 1 and 2 are independent of each other: 2 does not rest on 1, and 1 does
 not rest on 2. Finding 5 rests on the genus-3 machinery of 3.
@@ -567,23 +570,49 @@ genuinely periodic in `N`; if `v` is irrational it never closes, and that —
 not any quasi-periodicity in the weights — is the phenomenon. BN's own §4.6
 example happens to be the closed case, which is why it shows nothing.
 
-### 6.1 `v` measured
+### 6.1 `v` measured, and the `n`-parity term
 
-Fitting `e(n)` at each `n` and taking the two-step advance gives, for
-configuration A, a circular concentration of 0.999 and `v = (0.2859, 0.4154,
-0.2856) ± 0.0017`. A bootstrap ladder (1-step → 7 k-steps → 49 k-steps, each
-rung resolving the next rung's alias, and refusing to climb when 3σ of the prior
-exceeds half the alias spacing) sharpens this to
+The obvious model is pure linear advance, `e(n) = c + (n/2)v (mod 1)`, one
+k-step per `n → n+2`. **It is misspecified**, and badly. Fitting it leaves
+residuals with lag-1 autocorrelation `ρ = −0.997` across adjacent `n`
+(permutation `p < 10⁻⁴`) — a near-perfect alternation, not noise. Odd and even
+`n` are two different sublattices, and `e` carries a parity term:
 
 ```
-v_A = (0.28548, 0.41538, 0.28539) ± 0.00014
+e(n) = c + (n/2) v + (−1)ⁿ d   (mod 1)
 ```
 
-A second configuration C gives `(0.27091, 0.39754, 0.26986) ± 0.0053` — different,
-4.7σ fit-free. So `v` moves with the weights.
+This is the alignment of the weight pattern with the diamond — the same effect
+as the orientation flip of the height function with `n` parity — and it is a
+finite-`n` phenomenon, not part of `v`. Including it collapses configuration A's
+residual scatter from **0.111 to 0.0070** (16×), with concentration `R = 0.999`
+and amplitudes `d = (+0.111, −0.101, +0.124)`.
 
-**But sampling cannot settle rationality.** By Dirichlet some `p/q` always fits.
-A measurement of precision `ε` establishes only a lower bound on the period.
+A global circular fit with the parity term, using every `n` at once, then gives
+
+```
+v_A = (0.285430 ± 0.000113, 0.415401 ± 0.000109, 0.285357 ± 0.000092)
+```
+
+errors by residual bootstrap with the design held fixed.
+
+**Two estimator traps, both of which I fell into.** An earlier version of this
+section quoted `v_A = (0.28548, 0.41538, 0.28539) ± 0.00014` from a bootstrap
+ladder reading the endpoint pairs only. That error bar was not supported: it is
+a circular concentration computed from the **two** pairs `(88,186)` and
+`(89,187)`, which are adjacent and not independent. The ladder's answer is
+nonetheless close to right, for a reason it never states — both pairs have
+`Δn = 98`, which is *even*, so the parity term cancels identically. Separately,
+a global fit whose errors come from resampling `n` **with replacement** reports
+A's error as `±0.0020`, worse than the endpoint ladder using less data: that
+bootstrap randomizes the design, and this estimator's precision comes from the
+lever arm, so resamples that drop the extreme `n` collapse the baseline. The
+design must be held fixed and only the noise resampled.
+
+**Sampling still cannot settle rationality.** By Dirichlet some `p/q` always
+fits; a measurement of precision `ε` bounds the period from below and no more.
+Against the sharpened error, `2/7 = 0.2857142857` sits 2.5σ from `v₁` — excluded
+only weakly. The decisive exclusion is §6.3's, from the curve.
 
 ### 6.2 `v` computed from the curve
 
@@ -623,12 +652,54 @@ claimed below is real.
 
 | | computed from the curve | measured | |
 |---|---|---|---|
-| `v_A` | `(0.2855890797, 0.4154709760, 0.2853120189)` | `(0.28548, 0.41538, 0.28539)` | 0.8σ / 0.6σ / 0.6σ |
-| `v_C` | `(0.2658531593, 0.3971450057, 0.2748041556)` | `(0.27091, 0.39754, 0.26986)` | 1.0σ / 0.1σ / 0.9σ |
+| `v_A` | `(0.2855890797, 0.4154709760, 0.2853120189)` | `(0.285430, 0.415401, 0.285357)` | 1.4σ / 0.6σ / 0.5σ |
 
-Two independent routes — a Monte-Carlo fit to sampled height functions, and a
-period computation on the spectral curve — agreeing inside 1σ on all six
-components, on two different curves.
+`χ² = 2.6` on 3 dof. Two independent routes — a Monte-Carlo fit to sampled
+height functions, and a period computation on the spectral curve — agreeing on
+all three components of configuration A.
+
+**Configuration C agrees only in its labelling-invariant channels, and this is
+unresolved.** Taken per component under the facet labelling of `g3_facets.py`,
+C lands 3.8σ and 4.0σ away on components 1 and 3 (`χ² = 30`), while component 2
+agrees at 0.2σ. The failure has a clear shape: C's measured `v₁ = 0.270372` and
+`v₃ = 0.270010` are nearly equal, and the mean of the two predicted values is
+`(0.265853 + 0.274804)/2 = 0.270329`. Both components sit on the average of the
+pair — the signature of C's two *weak* facets being interchanged from one `n` to
+the next. Three things support that reading:
+
+* `e₁ + e₃` is invariant under the interchange, and against the curve's own
+  `v₁ + v₃` with nothing fitted but offsets it gives residual sd 0.036 against
+  0.104 for either component alone — 3× better. For configuration A the sum is
+  slightly *worse* than the components (0.0099 vs 0.0072 / 0.0057), which is
+  what summing uncorrelated noise does when there is no interchange to cancel.
+* A one-dimensional scan over `D = v₃ − v₁` with the interchange assigned per
+  `n` recovers `|D| = 0.00940` against the curve's `0.00895` — 5% in magnitude.
+* The same scan on configuration A returns an interchange rate of **0.00** out
+  of 31 points and reproduces the per-component fit to six digits, so the
+  per-`n` freedom is not manufacturing the agreement.
+
+But the scan's `D` comes out with the **opposite sign**, i.e. it wants
+components 1 and 3 globally transposed, and that transposition cannot be
+justified: C's `Im B` has `B₁₁ = 0.694` against `B₃₃ = 0.529`, 24% apart, so the
+two components are strongly distinguishable and the labelling is not free. The
+natural independent check — which labelled facet has the broader atom
+distribution — is **confounded**: C's facet 3 has 175 faces, so it is also the
+noisiest, and measured sds `(0.909, 1.075, 1.850)` running opposite to `B`'s
+diagonal is equally well explained by "broadest = noisiest" as by a
+transposition.
+
+So what C establishes is the invariant combinations — `v₁ + v₃` is itself
+unchanged by the transposition:
+
+| configuration C | measured | curve | |
+|---|---|---|---|
+| `v₁ + v₃` | `0.540474 ± 0.000563` | `0.540657` | 0.3σ |
+| `v₂` | `0.397195 ± 0.000275` | `0.397145` | 0.2σ |
+
+(The same channels for A: `v₁ + v₃ = 0.570788 ± 0.000156` against `0.570901`,
+and `v₂` as tabled — 0.7σ each.) C therefore confirms `v = −2u(0₊)` in every
+channel its facet data can actually speak to, and its individual weak-facet
+assignment is an open item, listed in §7.
 
 Rationality is then decidable, because a *computed* number can be tested far
 harder than a measured one. **The discriminator is the partial-quotient
@@ -650,8 +721,13 @@ which sat 0.1σ from the coarse measurement, is excluded outright: it differs fr
 v_A − v_C = (0.019735920423, 0.018325970377, 0.010507863355)
 ```
 
-exactly, from the two curves with no sampling anywhere — the weight-dependence
-of §6.1 confirmed from theory.
+exactly, from the two curves with no sampling anywhere. Measured, the
+labelling-invariant difference `(v₁+v₃)_A − (v₁+v₃)_C = 0.030314 ± 0.000585`
+against the curve's `0.030244` — 0.1σ, and 52σ from zero. So `v` demonstrably
+moves with the weights, which is the part of the argument that does not depend
+on any single `v` being irrational: `v` is an Abel-map expression in the angles,
+the angles move continuously with the edge weights, and a continuously varying
+quantity is irrational for almost every parameter value.
 
 So: `v` is irrational, the orbit does not close, and the dependence on `N` is
 quasi-periodic. The genus-1 case is torsion (`v = 1/4` exactly), which explains
@@ -687,6 +763,16 @@ Code: `abel_v.py`, `abel_exact.py`, `shift_vs_n.py`, `shift_g3.py`,
   §5.4 is clean. I never found a configuration with three healthy facets *and*
   `B₁₂ ≠ B₂₃` by more than 4.6%, so the two correlations are near-equal
   predictions rather than independently distinguishable ones.
+* **Configuration C's facet 1 ↔ 3 assignment is unresolved (§6.3).** The shift
+  velocities recover `|v₃ − v₁|` to 5% but want the two components globally
+  transposed, which C's own period matrix forbids (`B₁₁` and `B₃₃` differ by
+  24%). The atom-width check that would decide it is confounded by facet 3
+  being both the narrowest in `B` and the noisiest to measure (175 faces).
+  Resolving it needs either a configuration with three healthy facets and
+  `B₁₁ ≠ B₃₃`, or enough samples at C's endpoints to separate the two facets
+  per `n` rather than on average. Everything C contributes above is stated in
+  channels invariant under the transposition, so nothing else here depends on
+  which way it goes.
 * The `a = 0.7` row of the table in §3.2 is only 0.8% converged by the
   determinant method — though §3.6 now measures that point directly.
 * Of the genus-2 limit shape, only the two gas-facet *locations* are validated
