@@ -694,7 +694,7 @@ unchanged by the transposition:
 | configuration C | measured | curve | |
 |---|---|---|---|
 | `v₁ + v₃` | `0.540474 ± 0.000563` | `0.540657` | 0.3σ |
-| `v₂` | `0.397195 ± 0.000275` | `0.397145` | 0.2σ |
+| `v₂` | `0.397195 ± 0.000262` | `0.397145` | 0.2σ |
 
 (The same channels for A: `v₁ + v₃ = 0.570788 ± 0.000156` against `0.570901`,
 and `v₂` as tabled — 0.7σ each.) C therefore confirms `v = −2u(0₊)` in every
