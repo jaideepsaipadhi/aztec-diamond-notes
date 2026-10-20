@@ -807,14 +807,47 @@ docstring `P` *is* exactly the true characteristic polynomial (ratio 1 to
 pattern as `[[a,1],[1,a]]` instead of taking the derived
 `periodic_dimer.johansson_22`, which is the error §5 already warns about.
 
-So the remaining work is well-scoped and is not about the inverse: port
-`conditioned.py`'s facet path and conditioning to the full plane with
-`gasinv2`. That removes the `n ≈ 60` ceiling for the `a = 0.7` row and gives
-§3.3's retraction a second, sampling-free route. Neither is done here.
+So the remaining work is well-scoped and is not about the inverse. It is NOT,
+as an earlier version of this paragraph said, to port `conditioned.py`'s path:
+that observable is the wrong one (below). It is to apply `gasinv2` to §3.6's
+spatial average, which is the correct observable, giving the gas-facet
+distribution with no finite-size error and a second, sampling-free route to
+§3.3's diagnosis. Not done here.
 
-As recorded in §7.1's withdrawn versions, the `a = 0.7` row is a genuine
-finite-size effect and §3.2's observable is correct — see the restored table
-under §3.2 and the note in §7.5.
+**The `a = 0.7` row, and §3.2's observable: third and final statement, since I
+have flip-flopped on this once.** The atoms of §3.2's own observable, printed
+from `conditioned.pmf`:
+
+| | `a = 0.3`, `n = 48` | Corollary 4.17, `e = 1/4` |
+|---|---|---|
+| `P(−1)/P(0)` | 0.022545745 | `1.15e−5` |
+| `P(+1)/P(0)` | 0.022545722 | 0.0225458 |
+
+The measured distribution is **symmetric to seven digits**; the discrete
+component at `e = 1/4` is asymmetric by a factor of 2000. So §3.2's observable
+is not the discrete component, and its `−π/(2 ln r)` column agrees with `K′/K`
+through the cancellation §3.3 describes: for a symmetric discrete Gaussian
+`r = exp(−π/β)`, so `−π/(2 ln r) = β/2`, the measured `β` is exactly `2b`, and
+the column halves it back to `b`.
+
+An earlier revision "corrected" this on the strength of `r` matching
+`exp(−π/(2 K′/K))` to seven digits. That match is real — and it is the match of
+the **one-sided** ratio alone; I never printed the other side.
+
+Also wrong in that revision: I said `conditioned.py` "conditions away the local
+fluctuation". It does not. `equilibrate` is an exact rescaling leaving the
+determinant unchanged — "conditioned" there means *numerically* conditioned. The
+real difference from `lowrank.py` is the path endpoints: a BFS path between two
+specific faces, symmetric by construction, hence a symmetric `Δh` of scale `2b`.
+
+**Route count.** §3.2 measures a symmetric observable of scale exactly `2b`,
+reproducibly, to seven digits — a sharp empirical relation, but the factor of 2
+in it is precisely what §3.3 retracted and is nowhere derived. So §3.2 pins `b`
+only *given* that factor: calibrated against the answer, not independent of it.
+The independent routes number **four**, not five — the elliptic identity, the
+curve-plus-quadrature, §3.6's spatial average, and the Kasteleyn-matrix route.
+Converging the `a = 0.7` row is therefore not worth doing: it is the finite-`n`
+behaviour of an observable we do not want.
 
 ### 7.2 MOSTLY RESOLVED: the shift vector is no longer fitted
 
@@ -972,12 +1005,12 @@ must be chosen by someone who is not the person who wrote the formula" — or,
 failing that, swept exhaustively over the domain the formula claims, which is
 what `gasinv_validate.py` now does.
 
-A third instance, in the other direction: I demoted §3.2 from an independent
-route on the strength of §3.3's prose describing it as the single-face
-observable, without running `conditioned.py`. It is not that observable, and the
-demotion was wrong. Reading a retraction's summary is not checking what the code
-computes — the same substitution of a plausible account for a measurement that
-produced the original error.
+A third instance, which I then got wrong twice over: I demoted §3.2 from an
+independent route on the strength of §3.3's prose, without running the code —
+and recorded that demotion here as an error. It was not an error. Running the
+code later confirmed the demotion and refuted the "correction". So this entry
+was itself a false confession, written in the same reflex as the rest: a
+plausible account accepted without printing the object.
 
 A fourth instance, and the worst, because I reversed a correct statement.
 I had §3.2's observable right; then "corrected" it on the strength of its
