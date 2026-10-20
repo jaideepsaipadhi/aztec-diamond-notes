@@ -867,40 +867,59 @@ best an approximation. §3.3's conclusion is unaffected — it rests on §3.6 an
 the other routes, not on this mechanism — but the mechanism as written is
 unverified, and the near-symmetry remains unexplained.
 
-**The `a = 0.7` row, and §3.2's observable: third and final statement, since I
-have flip-flopped on this once.** The atoms of §3.2's own observable, printed
-from `conditioned.pmf`:
+**§3.2's observable, fourth and I believe final statement — this time with a
+mechanism and an identity rather than an inference.** I have twice demoted this
+table and once restored it, each time by reading off one number. Here is what it
+actually measures.
 
-| | `a = 0.3`, `n = 48` | Corollary 4.17, `e = 1/4` |
-|---|---|---|
-| `P(−1)/P(0)` | 0.022545745 | `1.15e−5` |
-| `P(+1)/P(0)` | 0.022545722 | 0.0225458 |
+*Why its distribution is exactly symmetric.* For the translation-invariant
+full-plane measure, `M_kl = K^{-1}[w_k, b_l]` is Toeplitz, and reversing the
+path transposes it. Since `det(I + D Mᵗ) = det(I + M D) = det(I + D M)` by
+Sylvester, `φ(−θ) = φ(θ)`, so the characteristic function is real and the pmf
+is **exactly** symmetric — for any straight path, unavoidably. That is why the
+atoms agree to seven digits rather than two or three, and it rules out
+"approximately symmetric by contamination" as the explanation. (A midpoint-parity
+mechanism was my first guess and is wrong: every start offset tested gives ratio
+1.000.)
 
-The measured distribution is **symmetric to seven digits**; the discrete
-component at `e = 1/4` is asymmetric by a factor of 2000. So §3.2's observable
-is not the discrete component, and its `−π/(2 ln r)` column agrees with `K′/K`
-through the cancellation §3.3 describes: for a symmetric discrete Gaussian
-`r = exp(−π/β)`, so `−π/(2 ln r) = β/2`, the measured `β` is exactly `2b`, and
-the column halves it back to `b`.
+*What it therefore measures.* Both endpoint faces lie in the same gas facet, so
+the discrete component — a single global integer shift — cancels **identically**
+in their difference. §3.2 measures pure local gas fluctuation, with no discrete
+component present at all. §3.3 is right that it is not the discrete component,
+and its stated mechanism (discrete component convolved with contamination) is
+wrong, which is exactly why that convolution failed to reproduce its own
+numbers.
 
-An earlier revision "corrected" this on the strength of `r` matching
-`exp(−π/(2 K′/K))` to seven digits. That match is real — and it is the match of
-the **one-sided** ratio alone; I never printed the other side.
+*The identity.* Computed from the spectral curve at `n = ∞`, with nothing from
+the finite diamond, the local fluctuation's neighbour ratio is
 
-Also wrong in that revision: I said `conditioned.py` "conditions away the local
-fluctuation". It does not. `equilibrate` is an exact rescaling leaving the
-determinant unchanged — "conditioned" there means *numerically* conditioned. The
-real difference from `lowrank.py` is the path endpoints: a BFS path between two
-specific faces, symmetric by construction, hence a symmetric `Δh` of scale `2b`.
+```
+r_fluct  =  exp(−π / 2b),        b = K′/K,  k² = 1 − a⁴
+```
 
-**Route count.** §3.2 measures a symmetric observable of scale exactly `2b`,
-reproducibly, to seven digits — a sharp empirical relation, but the factor of 2
-in it is precisely what §3.3 retracted and is nowhere derived. So §3.2 pins `b`
-only *given* that factor: calibrated against the answer, not independent of it.
-The independent routes number **four**, not five — the elliptic identity, the
-curve-plus-quadrature, §3.6's spatial average, and the Kasteleyn-matrix route.
-Converging the `a = 0.7` row is therefore not worth doing: it is the finite-`n`
-behaviour of an observable we do not want.
+| `a` | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 |
+|---|---|---|---|---|---|---|
+| rel. diff | `3.5e−16` | `5.2e−13` | `1.5e−10` | `1.5e−8` | `7.5e−7` | `2.4e−5` |
+
+Machine precision at `a = 0.2`; the growth with `a` is incomplete saturation at
+fixed separation, and pushing the separation at `a = 0.7` drives it down
+geometrically — `2.6e−3, 2.3e−4, 2.4e−5, 2.5e−6, 2.8e−7, 3.2e−8, 3.9e−9` at
+`D = 8 … 32`, a factor of ~9 per 4 units. The identity is exact.
+
+*Consequence.* `−π/(2 ln r) = b` identically, so §3.2's table **is** a correct
+determination of `b`, and its factor of 2 is a theorem about the local
+fluctuation rather than a calibration against the answer. The route count is
+**five**: the elliptic identity, the curve-plus-quadrature, §3.6's spatial
+average, the Kasteleyn-matrix route, and this one. What stays retracted is the
+claim §3.3 actually retracted — that the *discrete component* has scale `2b`.
+Two different observables both encode `b`, by different formulas, and the error
+was reading one as the other.
+
+*Why §3.6 can see the shift and §3.2 cannot.* Any height difference between two
+faces is symmetry-forced as above, so no such observable can ever reveal the
+shift `e = 1/4`. The shift is only visible relative to a fixed reference, which
+is what §3.6's spatial average has — its BFS tree is rooted at the frozen
+boundary.
 
 ### 7.2 MOSTLY RESOLVED: the shift vector is no longer fitted
 
