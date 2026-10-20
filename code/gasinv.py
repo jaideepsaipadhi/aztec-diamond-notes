@@ -11,6 +11,30 @@ i.e. the finite-n inverse equals the FULL-PLANE gas inverse up to an
 exponentially small error.  So accuracy there IMPROVES with n, exactly inverting
 the situation with the matrix method.
 
+STATUS.  This now reproduces the exact finite-n inverse, and the error shrinks
+monotonically with n at every offset -- which is the only check that can
+distinguish a correct formula from a plausible one, since a wrong formula has no
+reason to converge.  Relative error against the exact inverse, a = 0.7:
+
+        n      (1,1)     (3,3)     (5,5)
+       24      4.37%     8.40%    16.37%
+       32      2.68%     5.09%     9.38%
+       40      1.73%     3.27%     5.84%
+       48      1.16%     2.18%     3.81%
+       56      0.79%     1.49%     2.56%
+
+The error grows with the offset at fixed n because far offsets sit nearer the
+gas/liquid boundary, which is where the O(e^{-c1 m}) term lives.  Over this
+range of n the decay is as consistent with 1/n^2 as with e^{-c n/24} -- the
+facet half-width is only about n/24 at a = 0.7, so m grows slowly and the two
+forms cannot be told apart here.  Either way it converges.
+
+The fix was in the exponents, not the contours; see the comment in
+gas_inverse.  Because this routine is the n -> infinity limit, substituting it
+for the finite-n inverse in the Section 3.2 pipeline gives the gas-facet
+distribution with NO finite-size error and no n ~ 60 ceiling -- which is what
+the a = 0.7 row of that table needs.  That substitution is not done here.
+
     K(z,w) = [[i(a + 1/w), a + z], [a + 1/z, i(a + w)]]
     K(z,w)^{-1} = (1/P) [[i(a+w), -(a+z)], [-(a+1/z), i(a+1/w)]]
     P(z,w) = -2 - 2a^2 - a/w - aw - a/z - az
@@ -41,8 +65,29 @@ def gas_inverse(x, y, a, N=400):
     # fundamental-domain translation: solve y - x = u e1 + v e2 (+ offset in
     # the domain).  u = ((y-x).x + (y-x).y)/2 in the e1,e2 basis:
     d = y - x
+    # In the e1 = (1,1), e2 = (-1,1) basis, d = u e1 + v e2 gives these:
     u = (d[0] + d[1]) // 2
     v = (d[1] - d[0]) // 2
+    # ...but z and w are conjugate to translations by a FUNDAMENTAL DOMAIN, and
+    # the two-periodic domain is TWO e1/e2 steps wide, so the exponents are in
+    # domain units.  The leftover half-step is already carried by (a1, a2).
+    #
+    # Using the step counts directly -- which this routine did -- makes the
+    # formula decay twice as fast as the truth and lose the sign alternation
+    # entirely.  Against the exact finite-n inverse at a = 0.7, n = 32:
+    #
+    #     offset     exact        u (wrong)     u//2 (right)
+    #     (1,1)    +0.3763251    +0.3863986     +0.3863986
+    #     (3,3)    -0.1371630    +0.0631098     -0.1441511
+    #     (5,5)    +0.0576968    +0.0158635     +0.0631098
+    #     (7,7)    -0.0251806    +0.0046813     -0.0306703
+    #
+    # decay ratios: exact 0.364 / 0.421 / 0.436, u//2 0.373 / 0.438 / 0.486,
+    # u 0.163 / 0.251 / 0.295.  The contours are NOT the problem: the unit
+    # torus does lie inside the bounded amoeba component (the gas hole runs
+    # r1 in -0.50..+0.50, r2 in -0.48..+0.49 at a = 0.7), which was the other
+    # candidate explanation and is ruled out.
+    u, v = u // 2, v // 2
     th = 2*np.pi*np.arange(N)/N
     z = np.exp(1j*th)
     w = np.exp(1j*th)

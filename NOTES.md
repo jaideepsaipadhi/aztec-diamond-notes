@@ -747,38 +747,171 @@ Code: `abel_v.py`, `abel_exact.py`, `shift_vs_n.py`, `shift_g3.py`,
 
 ## 7. What I am least sure of
 
-* **The methodological one, which is the important one.** Every internal
-  consistency check I ran passed while the observable in §3.2–§3.4 was wrong, and
-  two independent computational routes agreed with each other because they shared
-  that observable. What caught it was a person who knew the theory pointing at the
-  observable. I do not have a procedure that would have caught it on my own, and
-  I should assume the same failure mode is live elsewhere in these notes.
-* The shift vector `e` at genus 3 is fitted, not predicted. It differs between
-  `n = 96` and `n = 192` — expected, since it depends on how the weight pattern
-  aligns with the diamond while `B` does not — but I cannot predict it from the
-  divisor, so the genus-3 test constrains `B` with `e` marginalised away rather
-  than testing the pair.
-* Configuration C's facet 3 has only 175 faces at `n = 192`, which is why its own
-  absolute fit is poor (atoms `χ² = 86.8/6`) even though the swap comparison in
-  §5.4 is clean. I never found a configuration with three healthy facets *and*
-  `B₁₂ ≠ B₂₃` by more than 4.6%, so the two correlations are near-equal
-  predictions rather than independently distinguishable ones.
-* **Configuration C's facet 1 ↔ 3 assignment is unresolved (§6.3).** The shift
-  velocities recover `|v₃ − v₁|` to 5% but want the two components globally
-  transposed, which C's own period matrix forbids (`B₁₁` and `B₃₃` differ by
-  24%). The atom-width check that would decide it is confounded by facet 3
-  being both the narrowest in `B` and the noisiest to measure (175 faces).
-  Resolving it needs either a configuration with three healthy facets and
-  `B₁₁ ≠ B₃₃`, or enough samples at C's endpoints to separate the two facets
-  per `n` rather than on average. Everything C contributes above is stated in
-  channels invariant under the transposition, so nothing else here depends on
-  which way it goes.
-* The `a = 0.7` row of the table in §3.2 is only 0.8% converged by the
-  determinant method — though §3.6 now measures that point directly.
-* Of the genus-2 limit shape, only the two gas-facet *locations* are validated
-  against sampling (§4, 0.9σ and 1.5σ). The rest of the profile — the arctic
-  curve, the frozen boundary, the liquid-region height — is predicted from the
-  Schottky data and never checked. An earlier version of this bullet denied the
-  facet check too, contradicting §4; that was my error, not a second result.
-* The contour-integral route that would remove the `n ≈ 60` ceiling is
-  incomplete. Nothing above depends on it.
+Attacked in order of what turned out to be tractable. Three of the seven moved;
+two were reframed; one is unchanged; one is untouched.
+
+### 7.1 RESOLVED: the contour-integral route, and with it the `a = 0.7` row
+
+These were two bullets and they are one item: the `a = 0.7` row of §3.2 is only
+0.8% converged because the determinant method dies at `n ≈ 60`, and the route
+that removes that ceiling is the full-plane gas inverse of `gasinv.py` — a
+double contour integral which, by Chhita–Johansson Theorem 2.6, equals the
+finite-`n` inverse up to `O(e^{−c m})`, so its accuracy *improves* with `n`.
+
+It was listed as "incomplete". It was in fact implemented and **wrong**, with a
+specific signature: against the exact finite-`n` inverse at `a = 0.7` it got
+the vanishing entries right and the long-range entries wrong in sign and
+magnitude, decaying about twice as fast as the truth.
+
+The cause is in the exponents, not the contours. `z` and `w` are conjugate to
+translations by a *fundamental domain*, and the two-periodic domain is two
+`e₁`/`e₂` steps wide, but the code used the step counts directly. (The other
+candidate explanation — contours on the unit torus rather than inside the gas
+hole — is ruled out: at `a = 0.7` the bounded amoeba component runs
+`r₁ ∈ [−0.50, 0.50]`, `r₂ ∈ [−0.48, 0.49]`, so the unit torus is inside it.)
+
+With the exponents in domain units the sign alternation and decay rate both
+come right, and the error shrinks monotonically with `n` at every offset —
+the only check that separates a correct formula from a plausible one, since a
+wrong formula has no reason to converge:
+
+| `n` | offset (1,1) | (3,3) | (5,5) |
+|---|---|---|---|
+| 24 | 4.37% | 8.40% | 16.37% |
+| 40 | 1.73% | 3.27% | 5.84% |
+| 56 | 0.79% | 1.49% | 2.56% |
+
+Because this routine *is* the `n → ∞` limit, substituting it for the finite-`n`
+inverse in the §3.2 pipeline gives the gas-facet distribution with no
+finite-size error at all, which converges the `a = 0.7` row with no
+extrapolation. That substitution is not yet done — it is the one remaining step
+and it is mechanical.
+
+### 7.2 MOSTLY RESOLVED: the shift vector is no longer fitted
+
+§6 identifies `v = −2u(0₊)`, which predicts `e`'s entire `n`-dependence. For
+configuration A, 93 fitted shift components collapse to **6** free numbers, and
+the velocity contributes none of them:
+
+| model | free parameters | mean residual sd |
+|---|---|---|
+| `e` free at each `n` | 93 | — |
+| `c + (n/2)v`, `v` fitted | 6 | 0.1122 |
+| `+ (−1)ⁿd`, `v` fitted | 9 | 0.0065 |
+| `+ (−1)ⁿd`, **`v` from the curve** | **6** | **0.0066** |
+
+Fitting `v` buys nothing over taking it from the curve. What remains fitted is
+the constant offset `c` and the parity amplitude `d` per component, and `d` is
+**not** any of the obvious closed forms — against `d = (+0.1112, −0.1008,
++0.1242) ± 0.0017`, every candidate is rejected at ≥ 7.6σ on some component:
+
+| candidate | `v/4` | `v/2` | `1/8` | `(1−v)/4` | `1/4` |
+|---|---|---|---|---|---|
+| worst component | 36.6σ | 61.1σ | 13.8σ | 37.8σ | 87.2σ |
+
+(`1/8` fits component 3 at 0.6σ and misses component 1 by 7.6σ, so it is a
+coincidence, not a pattern.) The three `d` differ in sign and magnitude, so
+they are not a universal constant either. Predicting `c` and `d` from the
+divisor is the remaining gap, now 6 numbers rather than a free function.
+
+### 7.3 REFRAMED: "no configuration with three healthy facets and `B₁₂ ≠ B₂₃`"
+
+The old bullet inferred from `|b₁₂ − b₂₃| ≤ 4.6%` that the two correlations
+were "near-equal predictions rather than independently distinguishable". That
+inference was never backed by a power calculation, and it is wrong. Samples
+needed to separate the true period matrix from the one with `b₁₂` and `b₂₃`
+interchanged, at fixed shift:
+
+| configuration | `\|b₁₂ − b₂₃\|` | samples for 5σ |
+|---|---|---|
+| A | 0.00046 | 25–76 **million** |
+| B | 0.01916 | **11,000 – 28,400** |
+| C | 0.01284 | 21,000 – 94,200 |
+
+The runs already use `K = 20,000`. So configuration B's 4.6% is comfortably
+detectable and A's 0.11% never will be — the asymmetry was never the obstacle.
+
+The actual obstacle is facet health, and it indicts the *search*: `g3_asym.py`
+**maximised** the asymmetry subject to a floor on facet size, and maximising it
+is exactly what starves a facet. Configuration B's facet 1 is 24 faces at
+`n = 96` and vanishes under erode 10. So B has the asymmetry and cannot be
+measured, which is the same disease as C.
+
+Why the search was never run the other way round: off the symmetric family there
+was no cheap measure of facet health. `hole_tune` locates holes by distance from
+`r₂ = 0`, valid only when `C(z) = A(z)`, and it returns *nothing* for both
+asymmetric configurations — which is why `g3_asym2.py` fell back to checking
+facet sizes by a sampling run, making each trial cost hours instead of a second.
+`hole_tune2.py` removes the symmetry assumption (the amoeba slice at fixed
+`|z| = e^{r₁}` is just the two roots `log|w±|`, with no reference to `r₂ = 0`),
+and is calibrated so that the number of bounded components it resolves tracks
+the number of usable facets:
+
+| configuration | components resolved | sampled truth |
+|---|---|---|
+| A | **3** (extents 1.80, 2.72, 2.80) | three healthy facets |
+| B | **2** | facet 1 = 24 faces |
+| C | **1** | facets 1 and 3 both weak (residual scatter 0.076 vs 0.016) |
+
+It reproduces `hole_tune`'s symmetric-family answer where that applies (A's
+three `r₁`-extents 0.65/0.62/0.67 against 0.64/0.64/0.64) and is only trusted
+off the family because of that. `g3_search_healthy.py` runs the inverted
+objective — maximise facet health subject to asym ≥ 2% — screening on the
+1-second proxy before the 19-second period matrix. If it finds nothing, that is
+itself a result: it would be evidence the (2,4) diamond family has no such
+configuration, and the item should be retired as a property of the family
+rather than left open as an unfinished search.
+
+### 7.4 UNCHANGED: configuration C's facet 1 ↔ 3 assignment
+
+Still open, as §6.3 describes. What is new is the route: configuration B would
+**not** be confounded the way C is — its predicted marginal widths differ by 2×
+(0.420 vs 0.222 at the operative shift) against `B₁₁`/`B₃₃` 66% apart — so a
+configuration from §7.3's search settles the labelling outright. Everything C
+contributes is stated in channels invariant under the transposition, so nothing
+depends on which way it goes.
+
+### 7.5 ATTACKED: the methodological item, which is still the important one
+
+The retracted §3.3 claim survived every internal consistency check because its
+two "independent" routes shared the observable that was wrong. The missing check
+is not another consistency test but a **dependency audit**: for each claim, list
+what its confirmations have in common, and treat a claim whose routes share a
+single point of failure as untested in that direction however many routes agree.
+
+`audit_shared.py` records that graph explicitly and reports the intersection per
+claim. It is hand-maintained on purpose: what matters is the *mathematical*
+dependency — which observable, which convention, which identity — and that is
+not visible in the call graph. The single-face observable and the spatial
+average share nearly all their code and differ in the one place that mattered.
+
+Run on the claims above it flags the retracted one correctly, naming the shared
+observable, using only the dependency table and no knowledge that the observable
+was wrong. It also flags two things I had not noticed:
+
+* **`v` irrational is a single-route claim.** 22 digits of precision is not
+  independence — a wrong A-period normalisation would give a wrong `v` to 22
+  digits just as cheerfully. The genus-1 fixture (`v = 1/4` exactly, known from
+  Remark 4.18) is the only external anchor, and it constrains the Abel
+  normalisation but not the curve.
+* **§5's four genus-3 checks have identical dependency sets.** Atoms,
+  correlations, marginal broadening and the A-vs-C falsification test different
+  *features* of one model against one measurement, which is worth something, but
+  none of them is an independent route.
+
+By contrast `v = −2u(0₊)` has two routes sharing *nothing* — a Monte-Carlo fit
+to sampled heights, and an Abel integral on the curve — which is the strongest
+structure in these notes.
+
+What the audit does not do is say which shared dependency is wrong, or that any
+is. It converts "two routes agree" into "two routes agree, and here is the one
+thing that would fool both", which is the question that had not been asked.
+
+### 7.6 UNTOUCHED: the genus-2 limit shape away from the facets
+
+Only the two gas-facet *locations* are validated against sampling (§4, 0.9σ and
+1.5σ). The arctic curve, frozen boundary and liquid-region height are predicted
+from the Schottky data and never checked. This needs a genus-2 Fock-weighted
+sampling run and a profile comparison; it is the one item here I have not
+started. (An earlier version of this bullet denied the facet check too,
+contradicting §4; that was my error, not a second result.)
