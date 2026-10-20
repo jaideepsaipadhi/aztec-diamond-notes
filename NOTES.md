@@ -806,20 +806,48 @@ which used the gas inverse to compute the §3.3 local fluctuation at
 `n = ∞` and would have given the retraction a second, sampling-free route, is
 built on it and its numbers are **void**.
 
-**Separately, and more important than the convergence question: the `a = 0.7`
-row is not a finite-size problem at all.** §3.3 retracts the observable used in
-§3.2 and §3.4 — it is the single-face height, which is the discrete component
-plus the local gas fluctuation — and lists `lowrank.py`, the code that produces
-that table, as retracted. The table nevertheless reproduces `K′/K` to six or
-seven digits at small `a`, and it does so through a *compensating pair of
-errors*: the contamination makes the three-atom distribution near-symmetric with
-scale `2b`, and the column `−π/(2 ln r)` halves it back to `b`. So the table is
-not an independent determination of `b`, and its degradation with `a` (0.8% at
-`a = 0.7`, 4.6% at `a = 0.8`) is confounded — the facet narrows *and* the
-contamination grows, both monotonically in `a`. The "0.8% converged" framing
-treats a systematic observable error as a finite-size effect. Whether the
-cancellation is exact in the limit is exactly what a working gas inverse would
-settle, and it is not settled.
+**On the `a = 0.7` row itself: I claimed in the previous revision of this
+subsection that it was not a finite-size problem but a retracted observable
+rescued by a compensating pair of errors. That was wrong, and it is withdrawn.
+The original framing was right.**
+
+What I had not done was run the code. `conditioned.ratio_checked` reproduces the
+table exactly — `r = 0.12871588618463778` at `a = 0.7`, `n = 48`, matching the
+quoted `0.128715886` in every digit, with `−π/(2 ln r)` giving the quoted
+0.743 / 0.766 / 0.769 at `n = 24, 48, 60`. And `r` is heading for Corollary
+4.17's true ratio, not a contaminated one:
+
+| `a` | `r` (`n = 48`) | `−π/(2 ln r)` | `K′/K` | rel. err | true `exp(−π/2b)` |
+|---|---|---|---|---|---|
+| 0.3 | 0.022545734 | 0.4142167 | 0.4142168 | `3.0e−7` | 0.022545760 |
+| 0.4 | 0.040259422 | 0.4889774 | 0.4889778 | `9.2e−7` | 0.040259542 |
+| 0.5 | 0.063502620 | 0.5698158 | 0.5698411 | `4.4e−5` | 0.063510393 |
+| 0.7 | 0.128715886 | 0.7661869 | 0.7727377 | `8.5e−3` | 0.130972498 |
+
+Seven digits at `a = 0.3` against the true **asymmetric** Corollary-4.17 ratio
+settles it. The contamination §3.3 describes inflates `P(+1)` and fills `P(−1)`;
+at `3 × 10⁻⁷` there is no room for any of it. And the error grows as
+`3e−7 → 9e−7 → 4.4e−5 → 8.5e−3`, tracking the facet half-width (`n/6` at
+`a = 0.5`, `n/24` at `a = 0.7`) — a finite-size progression, exactly as
+originally stated.
+
+The reason is in the filename: `conditioned.py` is the *conditioned* facet
+distribution, and the conditioning is what removes the local fluctuation.
+Unconditioned `lowrank.pmf` on the same model gives a broad liquid-dominated
+distribution (mass at `0, ±2, ±4, ±6, ±8` and `−π/(2 ln r)` bouncing
+0.849 / 0.894 / 0.860), which is what the single-face observable looks like.
+
+**So §3.3 and §7.5 over-attribute.** §3.3 says "What §3.2 and §3.4 measured was
+the height at a single face"; §3.2's conditioned table is not that, and is a
+correct and independently convergent route to `b`. The retraction of the
+factor-of-2 claim stands untouched — that came from the single-face measurement
+— but §3.2's table should not have been swept into it. For the dependency audit
+this matters: it restores §3.2 as one of the five routes to `B = 0.7727 i`,
+which the previous revision of these notes had demoted to four.
+
+What remains open here is only the original point: the `a = 0.7` row is 0.8%
+converged at `n = 48` and the determinant method stops near `n = 60`. A working
+gas inverse would remove that ceiling. Nothing else depends on it.
 
 ### 7.2 MOSTLY RESOLVED: the shift vector is no longer fitted
 
@@ -976,6 +1004,13 @@ agreement was easy. The lesson is not "check more cases" but "the validation set
 must be chosen by someone who is not the person who wrote the formula" — or,
 failing that, swept exhaustively over the domain the formula claims, which is
 what `gasinv_validate.py` now does.
+
+A third instance, in the other direction: I demoted §3.2 from an independent
+route on the strength of §3.3's prose describing it as the single-face
+observable, without running `conditioned.py`. It is not that observable, and the
+demotion was wrong. Reading a retraction's summary is not checking what the code
+computes — the same substitution of a plausible account for a measurement that
+produced the original error.
 
 What the audit does not do is say which shared dependency is wrong, or that any
 is. It converts "two routes agree" into "two routes agree, and here is the one
