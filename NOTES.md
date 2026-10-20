@@ -39,8 +39,17 @@ Aztec dimer model* (arXiv:2502.07241), cited as [BN].
    and Ronkin function to a variational limit shape, checked against sampling
    at `8 × 10⁻⁴`.
 
+5. **The quasi-periodic dependence on `N`, demonstrated (§6).** The shift
+   velocity `v` of equation (19) is identified as `−2 u(0₊)`, computed from the
+   spectral curve at 40 digits, and found to agree with an independent
+   Monte-Carlo measurement inside 1σ on all three components for each of two
+   weight configurations. Its continued fraction has only ordinary partial
+   quotients, so `v` is irrational and the orbit never closes. The genus-1 case
+   is 4-torsion — `v = 1/4` to 22 digits — which is why §4.6 of the paper, the
+   one worked example, is periodic and shows none of this.
+
 Findings 1 and 2 are independent of each other: 2 does not rest on 1, and 1 does
-not rest on 2.
+not rest on 2. Finding 5 rests on the genus-3 machinery of 3.
 
 ---
 
@@ -543,7 +552,124 @@ Code: `periodic_dimer.py`, `hyper_curve.py`, `hyper_g3.py`, `g3_sample.py`,
 
 ---
 
-## 6. What I am least sure of
+## 6. The shift velocity, and why the orbit never closes
+
+Everything above fixes the *scale* matrix `B`. The shift vector `e` is the other
+half of Theorem 1.2, and it is where the quasi-periodicity in `N` lives.
+Equation (19) makes `e` advance **linearly** on the Jacobian,
+
+```
+e^(kN) − e^(0) = N · k ( Σᵢ u(q₀,ᵢ) − ℓ Σᵢ u(p₀,ᵢ) ),
+```
+
+with some velocity `v`. If `v` is rational the orbit closes and the model is
+genuinely periodic in `N`; if `v` is irrational it never closes, and that —
+not any quasi-periodicity in the weights — is the phenomenon. BN's own §4.6
+example happens to be the closed case, which is why it shows nothing.
+
+### 6.1 `v` measured
+
+Fitting `e(n)` at each `n` and taking the two-step advance gives, for
+configuration A, a circular concentration of 0.999 and `v = (0.2859, 0.4154,
+0.2856) ± 0.0017`. A bootstrap ladder (1-step → 7 k-steps → 49 k-steps, each
+rung resolving the next rung's alias, and refusing to climb when 3σ of the prior
+exceeds half the alias spacing) sharpens this to
+
+```
+v_A = (0.28548, 0.41538, 0.28539) ± 0.00014
+```
+
+A second configuration C gives `(0.27091, 0.39754, 0.26986) ± 0.0053` — different,
+4.7σ fit-free. So `v` moves with the weights.
+
+**But sampling cannot settle rationality.** By Dirichlet some `p/q` always fits.
+A measurement of precision `ε` establishes only a lower bound on the period.
+
+### 6.2 `v` computed from the curve
+
+Equation (19) cannot be applied verbatim here: BN's `(k, ℓ)` family needs a
+Newton polygon with `2(k+ℓ)` boundary lattice points, and the diagonal-coordinate
+diamonds used here have four. But the *shape* of (19) survives. On a
+hyperelliptic curve the angles are the two points over `z = 0` and the two over
+`z = ∞`, and the hyperelliptic involution relates them: with base point `∞₊`,
+
+```
+u(∞₊) = 0,   u(∞₋) = A,   u(0₊) = B,   u(0₋) = A − B,
+```
+
+so *any* integer combination of angle images is `mA + nB`. That is a
+two-parameter ansatz against a measured 3-vector — overdetermined, hence a test
+rather than a fit. It picks out
+
+```
+genus 1, (2,2):   v = −B
+genus 3, (2,4):   v = −2B
+```
+
+Carried at 40 digits, with all `2g+2` branch points real and negative so `(0, ∞)`
+lies on one sheet:
+
+| | value | status |
+|---|---|---|
+| genus-1 fixture, `−B` | `0.2500000000000000000000168` | `= 1/4` to 22 digits |
+| `A − B`, config A | `(−0.25, −0.50, −0.75)` to 22 digits | 4-torsion, free check |
+| `A − B`, config C | `(−0.25, −0.50, −0.75)` to 22 digits | same, different curve |
+
+The genus-1 fixture is the calibration: `v = 1/4` is known independently from
+Remark 4.18, and the quadrature reproduces it to 22 digits. So the precision
+claimed below is real.
+
+### 6.3 The two agree, and `v` is irrational
+
+| | computed from the curve | measured | |
+|---|---|---|---|
+| `v_A` | `(0.2855890797, 0.4154709760, 0.2853120189)` | `(0.28548, 0.41538, 0.28539)` | 0.8σ / 0.6σ / 0.6σ |
+| `v_C` | `(0.2658531593, 0.3971450057, 0.2748041556)` | `(0.27091, 0.39754, 0.26986)` | 1.0σ / 0.1σ / 0.9σ |
+
+Two independent routes — a Monte-Carlo fit to sampled height functions, and a
+period computation on the spectral curve — agreeing inside 1σ on all six
+components, on two different curves.
+
+Rationality is then decidable, because a *computed* number can be tested far
+harder than a measured one. **The discriminator is the partial-quotient
+pattern.** If `v = p/q` with modest `q`, its continued fraction terminates and
+the tail is pure quadrature noise, which shows up as one astronomically large
+partial quotient. The genus-1 fixture does exactly that:
+
+```
+B  = [0, 1, 2, 1, 3718120517003592139456, 6, ...]      ->  exactly 3/4
+```
+
+All six genus-3 components instead have ordinary partial quotients — maxima
+between 13 and 311 — no termination, and the best rational with `q < 10⁶` misses
+by `5×10⁻¹³` to `3×10⁻¹²` rather than by zero. In particular `2/7 = 0.2857142857`,
+which sat 0.1σ from the coarse measurement, is excluded outright: it differs from
+`v₁` in the fourth decimal.
+
+```
+v_A − v_C = (0.019735920423, 0.018325970377, 0.010507863355)
+```
+
+exactly, from the two curves with no sampling anywhere — the weight-dependence
+of §6.1 confirmed from theory.
+
+So: `v` is irrational, the orbit does not close, and the dependence on `N` is
+quasi-periodic. The genus-1 case is torsion (`v = 1/4` exactly), which explains
+why the one worked example in the paper is periodic and the phenomenon is
+invisible there.
+
+**One caveat on the code.** `abel_exact.py`'s automatic `RATIONAL` flag is
+mis-calibrated — it reports "no exact rational" for the genus-1 `B`, which *is*
+exactly `3/4`, because the terminating convergent's error sits just above its
+threshold. The conclusion above rests on the partial-quotient pattern, which is
+unambiguous; the flag should be ignored or rewritten.
+
+Code: `abel_v.py`, `abel_exact.py`, `shift_vs_n.py`, `shift_g3.py`,
+`shift_g3c.py`, `shift_ladder.py`, `g3_facets.py`.
+
+---
+
+## 7. What I am least sure of
 
 * **The methodological one, which is the important one.** Every internal
   consistency check I ran passed while the observable in §3.2–§3.4 was wrong, and
@@ -563,6 +689,10 @@ Code: `periodic_dimer.py`, `hyper_curve.py`, `hyper_g3.py`, `g3_sample.py`,
   predictions rather than independently distinguishable ones.
 * The `a = 0.7` row of the table in §3.2 is only 0.8% converged by the
   determinant method — though §3.6 now measures that point directly.
-* The genus-2 limit shape is not validated against sampling.
+* Of the genus-2 limit shape, only the two gas-facet *locations* are validated
+  against sampling (§4, 0.9σ and 1.5σ). The rest of the profile — the arctic
+  curve, the frozen boundary, the liquid-region height — is predicted from the
+  Schottky data and never checked. An earlier version of this bullet denied the
+  facet check too, contradicting §4; that was my error, not a second result.
 * The contour-integral route that would remove the `n ≈ 60` ceiling is
   incomplete. Nothing above depends on it.
