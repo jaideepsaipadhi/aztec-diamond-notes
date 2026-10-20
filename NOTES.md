@@ -814,6 +814,59 @@ spatial average, which is the correct observable, giving the gas-facet
 distribution with no finite-size error and a second, sampling-free route to
 §3.3's diagnosis. Not done here.
 
+**The gas inverse applied: §3.3's contamination computed from the curve.**
+The discrete component of Theorem 1.2 is intrinsically a finite-`n` object — it
+is the integer global height shift the frozen boundary forces — so no
+full-plane computation can produce one. What the gas inverse gives is the
+*local* fluctuation, which is precisely §3.3's contamination, and whose size
+rested on sampling alone, sharing its entire dependency set with the retracted
+claim itself.
+
+The first attempt failed on a hand-rolled dual path (both up-edges of a black
+vertex given the same sign), whose variance grew linearly in the separation.
+Reusing `ndep.faces_and_steps`, whose signs alternate with parity and which
+underpins §3 and §5, fixes it, and the variance saturates as the gas phase
+requires:
+
+| `D` | 1 | 2 | 4 | 6 | 8 | 10 | 12 |
+|---|---|---|---|---|---|---|---|
+| `Var`, gas (`n = ∞`) | 0.1007 | 0.1756 | 0.2019 | 0.2074 | 0.2088 | 0.2092 | 0.2093 |
+| `Var`, exact `n = 64` | 0.1013 | 0.1768 | 0.2071 | 0.2204 | 0.2369 | 0.2637 | 0.3039 |
+
+The exact values track the gas limit to `D ≈ 4–6` and then diverge, which is
+the facet half-width at `n = 64` (`≈ n/24 ≈ 2.7`): the finite-`n` path leaves
+the facet, while at `n = ∞` the facet is infinite and the variance saturates.
+That is the finite-size ceiling being removed, on the correct observable.
+
+| `a` | `Var(∞)` | per-side mass | §3.3 claims (sampling) |
+|---|---|---|---|
+| 0.3 | 0.04315 | 0.02157 | — |
+| 0.5 | 0.11282 | **0.05635** | ~0.05 |
+| 0.7 | 0.20932 | **0.10373** | ~0.11 |
+
+Agreement at both values of `a`, so a two-point match rather than a
+coincidence, and at `D = 1` exact and gas agree to five digits at `a = 0.3` and
+`0.5`. **So §3.3's diagnosis now has a second route, sharing nothing with the
+first** — no sampling, no facet observable, no shuffling.
+
+**But §3.3's stated MECHANISM does not reproduce its own numbers.** Convolving
+the true discrete component with the computed fluctuation:
+
+| | `P(+1)/P(0)` | `P(−1)/P(0)` |
+|---|---|---|
+| convolution, `m = 0.1037` | 0.2574 | 0.1308 |
+| convolution, `m = 0.0523` | 0.1880 | 0.0602 |
+| §3.3 measured, single face | **0.1229** | **0.1323** |
+
+The measured distribution is far more symmetric than either convolution. So the
+*size* of the contamination is confirmed, and the account of how it manufactures
+the near-symmetry is not. The likeliest reason is the convolution's own
+assumption: the local fluctuation and the global shift are not independent, since
+conditioning on the shift changes the local statistics, so a convolution is at
+best an approximation. §3.3's conclusion is unaffected — it rests on §3.6 and on
+the other routes, not on this mechanism — but the mechanism as written is
+unverified, and the near-symmetry remains unexplained.
+
 **The `a = 0.7` row, and §3.2's observable: third and final statement, since I
 have flip-flopped on this once.** The atoms of §3.2's own observable, printed
 from `conditioned.pmf`:
