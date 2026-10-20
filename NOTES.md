@@ -750,42 +750,76 @@ Code: `abel_v.py`, `abel_exact.py`, `shift_vs_n.py`, `shift_g3.py`,
 Attacked in order of what turned out to be tractable. Three of the seven moved;
 two were reframed; one is unchanged; one is untouched.
 
-### 7.1 RESOLVED: the contour-integral route, and with it the `a = 0.7` row
+### 7.1 NOT RESOLVED: the contour-integral route (an earlier claim here retracted)
 
-These were two bullets and they are one item: the `a = 0.7` row of §3.2 is only
-0.8% converged because the determinant method dies at `n ≈ 60`, and the route
-that removes that ceiling is the full-plane gas inverse of `gasinv.py` — a
+These were two bullets and are one item: the `a = 0.7` row of §3.2 cannot be
+converged by the determinant method, which dies at `n ≈ 60`, and the route that
+would remove that ceiling is the full-plane gas inverse of `gasinv.py` — a
 double contour integral which, by Chhita–Johansson Theorem 2.6, equals the
 finite-`n` inverse up to `O(e^{−c m})`, so its accuracy *improves* with `n`.
 
-It was listed as "incomplete". It was in fact implemented and **wrong**, with a
-specific signature: against the exact finite-`n` inverse at `a = 0.7` it got
-the vanishing entries right and the long-range entries wrong in sign and
-magnitude, decaying about twice as fast as the truth.
+**An earlier version of this subsection claimed the route was fixed. That claim
+is withdrawn.** The sequence is worth recording because the mistake is the same
+one twice.
 
-The cause is in the exponents, not the contours. `z` and `w` are conjugate to
-translations by a *fundamental domain*, and the two-periodic domain is two
-`e₁`/`e₂` steps wide, but the code used the step counts directly. (The other
-candidate explanation — contours on the unit torus rather than inside the gas
-hole — is ruled out: at `a = 0.7` the bounded amoeba component runs
-`r₁ ∈ [−0.50, 0.50]`, `r₂ ∈ [−0.48, 0.49]`, so the unit torus is inside it.)
-
-With the exponents in domain units the sign alternation and decay rate both
-come right, and the error shrinks monotonically with `n` at every offset —
-the only check that separates a correct formula from a plausible one, since a
-wrong formula has no reason to converge:
+The original code got the vanishing entries right and the long-range entries
+wrong in sign and magnitude, decaying about twice as fast as the truth. `z` and
+`w` are conjugate to *fundamental-domain* translations and the two-periodic
+domain is two `e₁`/`e₂` steps wide, so using the step counts directly looked
+like the error; replacing `u` by `u // 2` restored the sign alternation and the
+decay rate, and the error then shrank monotonically with `n`:
 
 | `n` | offset (1,1) | (3,3) | (5,5) |
 |---|---|---|---|
 | 24 | 4.37% | 8.40% | 16.37% |
-| 40 | 1.73% | 3.27% | 5.84% |
 | 56 | 0.79% | 1.49% | 2.56% |
 
-Because this routine *is* the `n → ∞` limit, substituting it for the finite-`n`
-inverse in the §3.2 pipeline gives the gas-facet distribution with no
-finite-size error at all, which converges the `a = 0.7` row with no
-extrapolation. That substitution is not yet done — it is the one remaining step
-and it is mechanical.
+That is a real table and it is also the whole problem: those three offsets lie
+on one diagonal ray, and the ray is all `gasinv.py`'s own check ever covered
+(its other offsets return zero in both columns, being the wrong sublattice
+parity). Sweeping every offset in `[−5,5]²` instead:
+
+* **27 of 36 non-trivial offsets are wrong by more than 10% at `n = 48`**, and
+  their errors **do not shrink with `n`** — `(1,3)` goes 1.88 → 2.11 from
+  `n = 32` to 48, `(3,1)` 0.884 → 0.887, `(3,−3)` 3.74 → 3.71. A discrepancy
+  that does not decay is not the `O(e^{−c m})` term.
+* The nine that do agree are exactly those on or beside the tested ray.
+
+So `u // 2` repairs the ray and leaves most of the lattice wrong. The honest
+diagnosis of the underlying route is unchanged — Theorem 2.6 is not in doubt —
+but what is unimplemented is the fundamental-domain bookkeeping, in which
+
+```
+y − x = (whole-domain translation) + (offset within the domain)
+```
+
+with the first giving `z^u w^v` and the second selecting the entry of
+`K(z,w)^{-1}`. Neither `u` nor `u // 2` performs that split. I suspected floor
+division drops the within-domain half-step rather than absorbing it into the
+sublattice class, but the obvious consequence — distinct offsets colliding on
+one `(u//2, v//2, class)` key — does **not** occur (0 collisions over the same
+sweep), so the cause is open.
+
+`gasinv_validate.py` is the sweep, and is the deliverable here: a formula is
+validated on the inputs it was tested on and nowhere else. `gas_fluct.py`,
+which used the gas inverse to compute the §3.3 local fluctuation at
+`n = ∞` and would have given the retraction a second, sampling-free route, is
+built on it and its numbers are **void**.
+
+**Separately, and more important than the convergence question: the `a = 0.7`
+row is not a finite-size problem at all.** §3.3 retracts the observable used in
+§3.2 and §3.4 — it is the single-face height, which is the discrete component
+plus the local gas fluctuation — and lists `lowrank.py`, the code that produces
+that table, as retracted. The table nevertheless reproduces `K′/K` to six or
+seven digits at small `a`, and it does so through a *compensating pair of
+errors*: the contamination makes the three-atom distribution near-symmetric with
+scale `2b`, and the column `−π/(2 ln r)` halves it back to `b`. So the table is
+not an independent determination of `b`, and its degradation with `a` (0.8% at
+`a = 0.7`, 4.6% at `a = 0.8`) is confounded — the facet narrows *and* the
+contamination grows, both monotonically in `a`. The "0.8% converged" framing
+treats a systematic observable error as a finite-size effect. Whether the
+cancellation is exact in the limit is exactly what a working gas inverse would
+settle, and it is not settled.
 
 ### 7.2 MOSTLY RESOLVED: the shift vector is no longer fitted
 
@@ -922,7 +956,7 @@ By contrast `v = −2u(0₊)` has two routes sharing *nothing* — a Monte-Carlo
 to sampled heights, and an Abel integral on the curve — which is the strongest
 structure in these notes.
 
-**It has already caught me once, in this same pass.** §7.3 above describes a
+**It has already caught me twice, in this same pass.** §7.3 above describes a
 facet-health proxy I calibrated on the three configurations whose facet sizes I
 already knew, found consistent across all three, and then trusted on a fourth —
 where it failed outright. Three points, a plausible monotone trend, no held-out
@@ -932,6 +966,16 @@ checked, checked only where the answer was already known. The audit's rule —
 agreement is evidence only to the extent the routes can fail independently —
 applies to a proxy and its calibration set just as it does to two computational
 routes.
+
+And again in §7.1: I checked the gas inverse on three offsets along one
+diagonal ray, watched the error shrink with `n` at all three, and reported the
+route resolved. A sweep over all offsets in `[−5,5]²` shows 27 of 36 wrong, with
+errors that do not shrink with `n` at all. Identical shape to the proxy failure
+and to §3.3 itself: agreement everywhere it was checked, checked only where
+agreement was easy. The lesson is not "check more cases" but "the validation set
+must be chosen by someone who is not the person who wrote the formula" — or,
+failing that, swept exhaustively over the domain the formula claims, which is
+what `gasinv_validate.py` now does.
 
 What the audit does not do is say which shared dependency is wrong, or that any
 is. It converts "two routes agree" into "two routes agree, and here is the one
