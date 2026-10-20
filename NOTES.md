@@ -890,49 +890,52 @@ and its stated mechanism (discrete component convolved with contamination) is
 wrong, which is exactly why that convolution failed to reproduce its own
 numbers.
 
-*The identity, in its strong form.* Computed from the spectral curve at
-`n = ∞`, with nothing from the finite diamond, the saturated local fluctuation
-is **exactly a discrete Gaussian of scale `2b`**:
+*The identity, corrected. An earlier revision of this paragraph claimed the
+saturated local fluctuation is a discrete Gaussian of scale `2b` outright. That
+is true only for a subset of face classes, and I had checked exactly one.*
+
+Pushing several starting offsets to saturation at `a = 0.7` (all three converge;
+these are limits, not transients):
+
+| starting offset | saturated `P(1)/P(0)` | `P(2)/P(0)` |
+|---|---|---|
+| (0,0), (1,1), (2,0), (0,2) | **0.13097249** = `exp(−π/2b)` | `2.943e−4` |
+| (1,0) | 0.03428741 | `2.943e−4` |
+| (0,1) | 0.50029418 | `2.943e−4` |
+
+So the `k = ±1` atom depends on the face class mod 2 — taking at least three
+distinct values, with the two diagonal classes agreeing — while **the tail
+`k ≥ 2` is universal and exactly `DG(2b)`**: `2.943e−4` for every class, against
+`exp(−4π/2b)`, and at `k = 3` the measured atoms sit at `1.1e−8` against the
+same prediction. Verified relative to `DG(2b)` at `1.3e−6` (`k = 2`) and
+`4.3e−5` (`k = 3`).
+
+For the **diagonal classes** the whole distribution is `DG(2b)`, to
+`8.2e−14` at `a = 0.5`:
 
 ```
-P(k)/P(0)  =  exp(−π k² / 2b),        b = K′/K,  k² = 1 − a⁴
+P(k)/P(0) = exp(−π k² / 2b),    b = K′/K,  k² = 1 − a⁴
 ```
 
-not merely matching in its neighbour ratio. Beyond `k = 1`:
+**This still closes the factor of 2, and §3.2's table is still a correct
+determination of `b`** — its conditioned path starts at face `(0,0)`, which is
+in the diagonal class, which is why its ratio matches `exp(−π/2b)` to seven
+digits. The route count of five stands. What is withdrawn is the generality: the
+statement is about diagonal-class face pairs, with a universal tail, not about
+"the local fluctuation" tout court.
 
-| | `k = 1` | `k = 2` | `k = 3` |
-|---|---|---|---|
-| `a = 0.5`, rel. diff | `8.2e−14` | `1.1e−11` | below cutoff |
-| `a = 0.7`, rel. diff | `3.2e−8` | `1.5e−6` | `4.3e−5` |
+There are still two discrete Gaussians and the factor of 2 is still the ratio of
+their scales: the discrete component of Theorem 1.2 has scale `b` and shift
+`1/4`; the diagonal-class local fluctuation has scale `2b` and shift `0`.
 
-At `a = 0.7` the `k = 3` atom is itself `1.1e−8`, so agreeing to `4e−5`
-relative is a real test rather than a comparison of two near-zeros.
-
-**This closes the factor of 2 completely.** There are two discrete Gaussians in
-this model and they are different: the discrete component of Theorem 1.2 has
-scale `b` and shift `1/4`, and the local gas fluctuation has scale `2b` and
-shift `0`. Reading one for the other is precisely the retracted claim, and the
-"factor of 2, at every parameter value, to six digits" that §3.3 found so
-striking is the exact ratio of their scales. The neighbour-ratio form below is
-the `k = 1` case.
-
-| `a` | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 |
-|---|---|---|---|---|---|---|
-| rel. diff | `3.5e−16` | `5.2e−13` | `1.5e−10` | `1.5e−8` | `7.5e−7` | `2.4e−5` |
-
-Machine precision at `a = 0.2`; the growth with `a` is incomplete saturation at
-fixed separation, and pushing the separation at `a = 0.7` drives it down
-geometrically — `2.6e−3, 2.3e−4, 2.4e−5, 2.5e−6, 2.8e−7, 3.2e−8, 3.9e−9` at
-`D = 8 … 32`, a factor of ~9 per 4 units. The identity is exact.
-
-*Consequence.* `−π/(2 ln r) = b` identically, so §3.2's table **is** a correct
-determination of `b`, and its factor of 2 is a theorem about the local
-fluctuation rather than a calibration against the answer. The route count is
-**five**: the elliptic identity, the curve-plus-quadrature, §3.6's spatial
-average, the Kasteleyn-matrix route, and this one. What stays retracted is the
-claim §3.3 actually retracted — that the *discrete component* has scale `2b`.
-Two different observables both encode `b`, by different formulas, and the error
-was reading one as the other.
+*The genus-3 generalisation fails as first guessed.* The natural conjecture —
+facet `i`'s local fluctuation is `DG(2(Im B)_ii)` — was tested by sampling
+configuration A at `n = 96` and gives measured `P(1)/P(0)` of
+`0.271 / 0.122 / 0.138` against predicted `0.084 / 0.152 / 0.086`, off by up to
+3.2×. But the face pairs there were chosen by `x`-extremes within each facet and
+so are of arbitrary classes, which the genus-1 table above shows is exactly what
+the `k = 1` atom is sensitive to. The test must be redone on diagonal-class
+pairs before the conjecture is judged; as it stands it is untested, not refuted.
 
 *Why §3.6 can see the shift and §3.2 cannot.* Any height difference between two
 faces is symmetry-forced as above, so no such observable can ever reveal the
@@ -1125,6 +1128,14 @@ confirm a formula on the slice that is convenient (one diagonal ray, one fixed
 black vertex, one side of a distribution, three known configurations) and
 generalise. The habit that fixes it is not "check more" but "print the whole
 object" — the asymmetry was one line of output away throughout.
+
+A fifth instance, an hour after the fourth: I verified the scale-`2b` identity
+at one starting offset, pushed that offset to saturation, matched three atoms to
+`1e-14`, and committed it as a statement about the local fluctuation. Other
+offsets saturate to different `k = 1` atoms. The committed claim had to be
+narrowed to diagonal-class face pairs. The precision of the check (fourteen
+digits) was no protection at all, because precision and generality are
+independent and I kept spending effort on the first while assuming the second.
 
 What the audit does not do is say which shared dependency is wrong, or that any
 is. It converts "two routes agree" into "two routes agree, and here is the one
