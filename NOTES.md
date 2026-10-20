@@ -979,6 +979,16 @@ demotion was wrong. Reading a retraction's summary is not checking what the code
 computes — the same substitution of a plausible account for a measurement that
 produced the original error.
 
+A fourth instance, and the worst, because I reversed a correct statement.
+I had §3.2's observable right; then "corrected" it on the strength of its
+one-sided ratio matching theory to seven digits, without printing the other
+side; the distribution is symmetric to seven digits where theory demands a
+2000:1 asymmetry. Three of these four failures are literally the same act:
+confirm a formula on the slice that is convenient (one diagonal ray, one fixed
+black vertex, one side of a distribution, three known configurations) and
+generalise. The habit that fixes it is not "check more" but "print the whole
+object" — the asymmetry was one line of output away throughout.
+
 What the audit does not do is say which shared dependency is wrong, or that any
 is. It converts "two routes agree" into "two routes agree, and here is the one
 thing that would fool both", which is the question that had not been asked.
