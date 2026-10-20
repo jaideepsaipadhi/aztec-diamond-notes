@@ -127,14 +127,21 @@ if __name__ == "__main__":
         score = min(fs)
         print(f"  step {t:5d}  asym {r['asym']:.4f}  diag "
               f"{[round(x,3) for x in r['diag']]}  facets {fs}", flush=True)
-        if score >= MINFACET and (best is None or score > best[0]):
-            best = (score, U, V_, r, fs)
+        # Objective flipped.  Healthy facets are now known to be attainable
+        # (configuration E: facets [471, 171, 180] at asym 0.0237), so the
+        # binding constraint is the asymmetry: the power calculation wants
+        # |b12 - b23| ~ 0.019 to bring the b12<->b23 swap test inside the usual
+        # K = 20,000, and E's 0.0104 needs 68,000.  So maximise asym subject to
+        # healthy facets -- the reverse of this script's first version, and of
+        # g3_asym.py's objective, which had no facet constraint that bit.
+        if score >= MINFACET and (best is None or r['asym'] > best[0]):
+            best = (r['asym'], U, V_, r, fs)
             np.save(os.path.join(HERE, 'g3e_weights.npy'),
                     np.array([U, V_], dtype=float))
             np.save(os.path.join(HERE, 'g3e_ImB.npy'),
                     np.array([[float(r['ImB'][i, j]) for j in range(3)]
                               for i in range(3)]))
-            print(f"      *** FEASIBLE, min facet {score} -- "
+            print(f"      *** FEASIBLE asym {r['asym']:.4f} min facet {score} -- "
                   f"saved g3e_weights.npy / g3e_ImB.npy", flush=True)
         # drift towards asymmetry while keeping facets alive
         if score >= MINFACET // 2:
@@ -149,8 +156,8 @@ if __name__ == "__main__":
               "about the search, and the item should be restated as a property "
               "of the family.")
     else:
-        score, U, V_, r, fs = best
-        print(f"\nBEST: min facet {score}, facets {fs}, asym {r['asym']:.4f}")
+        _, U, V_, r, fs = best
+        print(f"\nBEST: asym {r['asym']:.4f}, facets {fs}, min {min(fs)}")
         print(f"  diag {[round(x,5) for x in r['diag']]}")
         print(f"  b12 {r['b12']:.5f}  b23 {r['b23']:.5f}")
         print(f"  WU = {[[round(x,5) for x in q] for q in U]}")

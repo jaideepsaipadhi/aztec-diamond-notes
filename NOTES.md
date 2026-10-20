@@ -890,12 +890,31 @@ and its stated mechanism (discrete component convolved with contamination) is
 wrong, which is exactly why that convolution failed to reproduce its own
 numbers.
 
-*The identity.* Computed from the spectral curve at `n = ∞`, with nothing from
-the finite diamond, the local fluctuation's neighbour ratio is
+*The identity, in its strong form.* Computed from the spectral curve at
+`n = ∞`, with nothing from the finite diamond, the saturated local fluctuation
+is **exactly a discrete Gaussian of scale `2b`**:
 
 ```
-r_fluct  =  exp(−π / 2b),        b = K′/K,  k² = 1 − a⁴
+P(k)/P(0)  =  exp(−π k² / 2b),        b = K′/K,  k² = 1 − a⁴
 ```
+
+not merely matching in its neighbour ratio. Beyond `k = 1`:
+
+| | `k = 1` | `k = 2` | `k = 3` |
+|---|---|---|---|
+| `a = 0.5`, rel. diff | `8.2e−14` | `1.1e−11` | below cutoff |
+| `a = 0.7`, rel. diff | `3.2e−8` | `1.5e−6` | `4.3e−5` |
+
+At `a = 0.7` the `k = 3` atom is itself `1.1e−8`, so agreeing to `4e−5`
+relative is a real test rather than a comparison of two near-zeros.
+
+**This closes the factor of 2 completely.** There are two discrete Gaussians in
+this model and they are different: the discrete component of Theorem 1.2 has
+scale `b` and shift `1/4`, and the local gas fluctuation has scale `2b` and
+shift `0`. Reading one for the other is precisely the retracted claim, and the
+"factor of 2, at every parameter value, to six digits" that §3.3 found so
+striking is the exact ratio of their scales. The neighbour-ratio form below is
+the `k = 1` case.
 
 | `a` | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 |
 |---|---|---|---|---|---|---|
@@ -1012,14 +1031,30 @@ If a long run finds nothing, that is now evidence about the `(2,4)` diamond
 family itself rather than about the search, and the item should be restated as
 a property of the family.
 
-### 7.4 UNCHANGED: configuration C's facet 1 ↔ 3 assignment
+### 7.4 UNBLOCKED: configuration C's facet 1 ↔ 3 assignment
 
-Still open, as §6.3 describes. What is new is the route: configuration B would
-**not** be confounded the way C is — its predicted marginal widths differ by 2×
-(0.420 vs 0.222 at the operative shift) against `B₁₁`/`B₃₃` 66% apart — so a
-configuration from §7.3's search settles the labelling outright. Everything C
-contributes is stated in channels invariant under the transposition, so nothing
-depends on which way it goes.
+Still unresolved for C itself, but no longer blocked. §7.3's ground-truth search
+found a usable configuration in seven trials — **configuration E**:
+
+```
+Im B  diag (0.6689, 1.0447, 0.5579),  b12 = 0.22392, b23 = 0.21356
+facets at n = 96:  [471, 171, 180]      asym 0.0237
+```
+
+Three healthy facets, and — the point for this item — predicted marginal widths
+`(0.4667, 0.3362, 0.1047)` at the operative shift, so facets 1 and 3 differ by
+a factor **4.46** in width. C's own width test was confounded because its facet
+3 is both narrowest in `B` and noisiest to measure; E's is not, so a measurement
+on E fixes the position-ordering-versus-component-ordering question outright,
+which is what C's assignment turns on.
+
+What E does *not* settle is §7.3's other half: its `|b12 − b23| = 0.0104` puts
+the `b12 ↔ b23` swap test at **68,100** samples, against 20,000 for the usual
+runs. So the search objective has been flipped — healthy facets are now known
+to be attainable, so the binding constraint is the asymmetry, and it maximises
+asym subject to the facet floor rather than the reverse. The log shows
+asym 0.057–0.059 reached with facets `[597, 119, 65]` and `[528, 158, 57]`, i.e.
+facet 3 just under the threshold, so a configuration with both looks close.
 
 ### 7.5 ATTACKED: the methodological item, which is still the important one
 
