@@ -948,13 +948,14 @@ coincidence, not a pattern.) The three `d` differ in sign and magnitude, so
 they are not a universal constant either. Predicting `c` and `d` from the
 divisor is the remaining gap, now 6 numbers rather than a free function.
 
-### 7.3 REFRAMED: "no configuration with three healthy facets and `B₁₂ ≠ B₂₃`"
+### 7.3 RESOLVED, by discovering the premise was false
 
-The old bullet inferred from `|b₁₂ − b₂₃| ≤ 4.6%` that the two correlations
-were "near-equal predictions rather than independently distinguishable". That
-inference was never backed by a power calculation, and it is wrong. Samples
-needed to separate the true period matrix from the one with `b₁₂` and `b₂₃`
-interchanged, at fixed shift:
+The item was: no configuration has three healthy facets *and* `B₁₂ ≠ B₂₃` by
+more than 4.6%, so the two correlations are not independently distinguishable.
+Three separate things were wrong with it.
+
+**The asymmetry was never the obstacle.** Samples needed to separate the true
+period matrix from the one with `b₁₂` and `b₂₃` interchanged, at fixed shift:
 
 | configuration | `\|b₁₂ − b₂₃\|` | samples for 5σ |
 |---|---|---|
@@ -962,58 +963,54 @@ interchanged, at fixed shift:
 | B | 0.01916 | **11,000 – 28,400** |
 | C | 0.01284 | 21,000 – 94,200 |
 
-The runs already use `K = 20,000`. So configuration B's 4.6% is comfortably
-detectable and A's 0.11% never will be — the asymmetry was never the obstacle.
+The runs already use `K = 20,000`. So 4.6% is comfortably detectable and A's
+0.11% never will be; the original inference was drawn without a power
+calculation.
 
-The actual obstacle is facet health, and it indicts the *search*: `g3_asym.py`
-**maximised** the asymmetry subject to a floor on facet size, and maximising it
-is exactly what starves a facet. Configuration B's facet 1 is 24 faces at
-`n = 96` and vanishes under erode 10. So B has the asymmetry and cannot be
-measured, which is the same disease as C.
+**The search's objective was backwards.** `g3_asym.py` *maximised* the
+asymmetry subject to a floor on facet size, and maximising it is exactly what
+starves a facet — configuration B's facet 1 is 24 faces at `n = 96` and empty
+under erode 10. Given the power table, 2% suffices, so facet health should be
+the objective and the asymmetry the constraint.
 
-Why the search was never run the other way round: off the symmetric family there
-was no cheap measure of facet health. `hole_tune` locates holes by distance from
-`r₂ = 0`, valid only when `C(z) = A(z)`, and it returns *nothing* for both
-asymmetric configurations — which is why `g3_asym2.py` fell back to checking
-facet sizes by a sampling run, making each trial cost hours instead of a second.
-`hole_tune2.py` removes the symmetry assumption (the amoeba slice at fixed
-`|z| = e^{r₁}` is just the two roots `log|w±|`, with no reference to `r₂ = 0`)
-and does reproduce `hole_tune`'s symmetric-family answer where that applies
-(A's three `r₁`-extents 0.65/0.62/0.67 against 0.64/0.64/0.64). On the three
-configurations whose facet sizes were already known it looked consistent:
+**And the reason it was never run that way was a cost premise that is false.**
+`g3_asym2.py` checks facet sizes "afterwards by a short sampling run, which is
+the ground truth anyway", which I read as minutes-to-hours per trial, and went
+looking for a cheap curve-side proxy. Two attempts, both failed, both with
+clear causes worth recording:
 
-| configuration | components resolved | sampled truth |
-|---|---|---|
-| A | 3 (extents 1.80, 2.72, 2.80) | three healthy facets |
-| B | 2 | facet 1 = 24 faces |
-| C | 1 | facets 1 and 3 both weak |
+* **amoeba holes** (`hole_tune2.py`). A bounded complement component says the
+  gas *phase* exists in the infinite model, not that its facet lands inside a
+  finite diamond at a usable size. False positive on the first new
+  configuration it was applied to — config D resolved three components with
+  smallest extent 1.54, and its facet 1 has **0** faces by sampling.
+* **exact finite-`n` facet sizes from `K^{-1}`** (`facet_exact.py`). Correct in
+  principle, and the selected sparse inversion agrees with
+  `g3_sample.exact_edge_probs` to `5e−15`. But `Σ_e p_e = |B|` is an exact
+  identity and therefore a free self-check, and it fails: relative error
+  `1e−15, 2e−13, 2e−9, 9e−4` at `n = 16, 32, 40, 48`, with probabilities
+  exceeding 1 beyond that — `cond(K) ~ 10^{0.252n}`, the same ceiling §3.5
+  documents. Exact equilibration buys ~70× at `n = 40` and does not extend the
+  range. And at `n ≤ 40` the facets have not developed: **every** configuration
+  including A has an empty facet there. The accurate regime and the informative
+  regime do not overlap, so this cannot work in double precision.
 
-**But the proxy does not work, and I established that by using it.**
-`g3_search_healthy.py` ran the inverted objective and returned a configuration
-D with three resolved components, smallest extent 1.54, asym 2.72% and
-`B₁₁`/`B₃₃` 38% apart — apparently exactly the configuration this item asks
-for. Sampling it says facet 1 has **0 faces** at `n = 96`, worse than B. A
-false positive on the first new configuration the proxy was ever applied to.
+Then I measured the thing I had assumed. **Facet health by sampling at
+`n = 96` costs 9–17 seconds** — the descent dominates, the height profile
+itself is 2–3 s — against ~19 s for the period matrix. The ground truth was
+never expensive, no proxy is needed, and neither of the above was necessary.
 
-The reason is a distinction the proxy ignores. A bounded amoeba component says
-the gas *phase* exists in the infinite model. Whether that phase's facet
-appears inside a finite Aztec diamond, and how large it is, is set by the
-**limit shape** — the Ronkin function and the polygon map of §4 — not by the
-hole alone. So a usable facet-health measure needs the §4 machinery, which is
-why `g3_asym2.py` fell back to "facet sizes checked afterwards by a short
-sampling run, which is the ground truth anyway". That fallback was not laziness;
-it was correct.
+`g3_search2.py` is the search: stage 1 the period matrix (reject unless
+`asym ≥ 2%`, `min diag ≥ 0.5`), stage 2 the real facet sizes from
+`g3_erode.facet_masks` on a sampled profile — the same detector and observable
+as §5, so anything that passes can actually be measured. Most proposals fail
+stage 1, so the average trial is ~20 s. Early output reaches
+`asym = 0.051` with facets `[491, 121, 109]` against a threshold of 120, so
+feasible configurations appear to be within reach rather than absent.
 
-So this item is **not** resolved. What is established is the half that does not
-depend on the proxy: the asymmetry was never the obstacle (the power table
-above), the old search's objective was backwards, and facet health is the real
-constraint. What is missing is a cheap way to measure facet health off the
-symmetric family, and the amoeba holes are not it. `hole_tune2.py` is still
-worth keeping — it is the correct generalisation of `hole_tune` and gives the
-gas phases without the symmetry assumption — but it must not be read as a facet
-measure. The honest next step is a limit-shape-based score, or accepting that
-each trial costs a short sampling run and searching a much smaller number of
-candidates.
+If a long run finds nothing, that is now evidence about the `(2,4)` diamond
+family itself rather than about the search, and the item should be restated as
+a property of the family.
 
 ### 7.4 UNCHANGED: configuration C's facet 1 ↔ 3 assignment
 
