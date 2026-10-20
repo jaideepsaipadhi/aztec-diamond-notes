@@ -45,7 +45,7 @@ import sys
 
 import numpy as np
 
-import gasinv as G
+import gasinv2 as G
 from twoperiodic import E1, E2, vertices
 
 CLS = G.cls
@@ -126,7 +126,16 @@ def pmf_inf(L, a, Mpts=64, N=600):
 
 
 def summarise(p, step=4):
-    """Atoms on the height lattice (spacing `step`), centred on the mode."""
+    """Atoms on the height lattice (spacing `step`), centred on the mode.
+
+    The index must be WRAPPED into (-Mpts/2, Mpts/2] before dividing by `step`:
+    the pmf comes from an FFT, so an atom at height -1 sits at index Mpts-step,
+    and reading it as a positive index puts it at k = +15 instead of -1.  That
+    silently corrupts every moment (it was giving variances of ~50 for a
+    distribution supported on three atoms) while leaving P(0) correct, so it is
+    invisible if only the central atom is checked.
+    """
+    M = len(p)
     idx = np.array([i for i, v in enumerate(p) if abs(v) > 1e-7])
     if idx.size == 0:
         return None
@@ -134,7 +143,8 @@ def summarise(p, step=4):
     c = idx[int(np.argmax(vals))]
     out = {}
     for i, v in zip(idx, vals):
-        k = int(round((i - c) / step))
+        off = ((i - c + M // 2) % M) - M // 2
+        k = int(round(off / step))
         out[k] = out.get(k, 0.0) + float(v)
     return out
 
