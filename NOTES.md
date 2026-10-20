@@ -843,24 +843,43 @@ was no cheap measure of facet health. `hole_tune` locates holes by distance from
 asymmetric configurations — which is why `g3_asym2.py` fell back to checking
 facet sizes by a sampling run, making each trial cost hours instead of a second.
 `hole_tune2.py` removes the symmetry assumption (the amoeba slice at fixed
-`|z| = e^{r₁}` is just the two roots `log|w±|`, with no reference to `r₂ = 0`),
-and is calibrated so that the number of bounded components it resolves tracks
-the number of usable facets:
+`|z| = e^{r₁}` is just the two roots `log|w±|`, with no reference to `r₂ = 0`)
+and does reproduce `hole_tune`'s symmetric-family answer where that applies
+(A's three `r₁`-extents 0.65/0.62/0.67 against 0.64/0.64/0.64). On the three
+configurations whose facet sizes were already known it looked consistent:
 
 | configuration | components resolved | sampled truth |
 |---|---|---|
-| A | **3** (extents 1.80, 2.72, 2.80) | three healthy facets |
-| B | **2** | facet 1 = 24 faces |
-| C | **1** | facets 1 and 3 both weak (residual scatter 0.076 vs 0.016) |
+| A | 3 (extents 1.80, 2.72, 2.80) | three healthy facets |
+| B | 2 | facet 1 = 24 faces |
+| C | 1 | facets 1 and 3 both weak |
 
-It reproduces `hole_tune`'s symmetric-family answer where that applies (A's
-three `r₁`-extents 0.65/0.62/0.67 against 0.64/0.64/0.64) and is only trusted
-off the family because of that. `g3_search_healthy.py` runs the inverted
-objective — maximise facet health subject to asym ≥ 2% — screening on the
-1-second proxy before the 19-second period matrix. If it finds nothing, that is
-itself a result: it would be evidence the (2,4) diamond family has no such
-configuration, and the item should be retired as a property of the family
-rather than left open as an unfinished search.
+**But the proxy does not work, and I established that by using it.**
+`g3_search_healthy.py` ran the inverted objective and returned a configuration
+D with three resolved components, smallest extent 1.54, asym 2.72% and
+`B₁₁`/`B₃₃` 38% apart — apparently exactly the configuration this item asks
+for. Sampling it says facet 1 has **0 faces** at `n = 96`, worse than B. A
+false positive on the first new configuration the proxy was ever applied to.
+
+The reason is a distinction the proxy ignores. A bounded amoeba component says
+the gas *phase* exists in the infinite model. Whether that phase's facet
+appears inside a finite Aztec diamond, and how large it is, is set by the
+**limit shape** — the Ronkin function and the polygon map of §4 — not by the
+hole alone. So a usable facet-health measure needs the §4 machinery, which is
+why `g3_asym2.py` fell back to "facet sizes checked afterwards by a short
+sampling run, which is the ground truth anyway". That fallback was not laziness;
+it was correct.
+
+So this item is **not** resolved. What is established is the half that does not
+depend on the proxy: the asymmetry was never the obstacle (the power table
+above), the old search's objective was backwards, and facet health is the real
+constraint. What is missing is a cheap way to measure facet health off the
+symmetric family, and the amoeba holes are not it. `hole_tune2.py` is still
+worth keeping — it is the correct generalisation of `hole_tune` and gives the
+gas phases without the symmetry assumption — but it must not be read as a facet
+measure. The honest next step is a limit-shape-based score, or accepting that
+each trial costs a short sampling run and searching a much smaller number of
+candidates.
 
 ### 7.4 UNCHANGED: configuration C's facet 1 ↔ 3 assignment
 
@@ -902,6 +921,17 @@ was wrong. It also flags two things I had not noticed:
 By contrast `v = −2u(0₊)` has two routes sharing *nothing* — a Monte-Carlo fit
 to sampled heights, and an Abel integral on the curve — which is the strongest
 structure in these notes.
+
+**It has already caught me once, in this same pass.** §7.3 above describes a
+facet-health proxy I calibrated on the three configurations whose facet sizes I
+already knew, found consistent across all three, and then trusted on a fourth —
+where it failed outright. Three points, a plausible monotone trend, no held-out
+test, and the calibration set was the same set that motivated the proxy. That is
+the §3.3 failure mode exactly: a quantity that agrees everywhere it has been
+checked, checked only where the answer was already known. The audit's rule —
+agreement is evidence only to the extent the routes can fail independently —
+applies to a proxy and its calibration set just as it does to two computational
+routes.
 
 What the audit does not do is say which shared dependency is wrong, or that any
 is. It converts "two routes agree" into "two routes agree, and here is the one
