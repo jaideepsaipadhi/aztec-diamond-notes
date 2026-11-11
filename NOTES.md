@@ -890,52 +890,63 @@ and its stated mechanism (discrete component convolved with contamination) is
 wrong, which is exactly why that convolution failed to reproduce its own
 numbers.
 
-*The identity, corrected. An earlier revision of this paragraph claimed the
-saturated local fluctuation is a discrete Gaussian of scale `2b` outright. That
-is true only for a subset of face classes, and I had checked exactly one.*
+*The identity, in its final and much stronger form.* Two earlier revisions of
+this paragraph got the scope wrong — first claiming `DG(2b)` for the local
+fluctuation outright, then narrowing it to diagonal-class pairs with a universal
+tail. Both were reading one quantity when there are three, and the right
+statement is about the LOCAL HEIGHT, not about differences.
 
-Pushing several starting offsets to saturation at `a = 0.7` (all three converge;
-these are limits, not transients):
+Every measurement here runs from a face at offset `off` to `off + (D, 0)` with
+`D` even, so **both endpoints lie in the same class** and each measured law is a
+SELF-DIFFERENCE of that class's local-height law `μ_c`. Undoing the
+self-difference identifies `μ_c`:
 
-| starting offset | saturated `P(1)/P(0)` | `P(2)/P(0)` |
+| face class | measured `P(1)/P(0)` | `μ_c` |
 |---|---|---|
-| (0,0), (1,1), (2,0), (0,2) | **0.13097249** = `exp(−π/2b)` | `2.943e−4` |
-| (1,0) | 0.03428741 | `2.943e−4` |
-| (0,1) | 0.50029418 | `2.943e−4` |
+| (1,0) | 0.034287415 | **`DG(b)`, shift 0** |
+| (0,1) | 0.500294179 | **`DG(b)`, shift 1/2** |
+| (0,0), (1,1) diagonal | 0.130972494 | difference is `DG(2b)`; see below |
 
-So the `k = ±1` atom depends on the face class mod 2 — taking at least three
-distinct values, with the two diagonal classes agreeing — while **the tail
-`k ≥ 2` is universal and exactly `DG(2b)`**: `2.943e−4` for every class, against
-`exp(−4π/2b)`, and at `k = 3` the measured atoms sit at `1.1e−8` against the
-same prediction. Verified relative to `DG(2b)` at `1.3e−6` (`k = 2`) and
-`4.3e−5` (`k = 3`).
+with `b = K′/K`, `k² = 1 − a⁴`. Checked at three values of `a`, against the
+self-difference of the stated `μ_c` computed independently:
 
-For the **diagonal classes** the whole distribution is `DG(2b)`, to
-`8.2e−14` at `a = 0.5`:
+| `a` | diagonal | (1,0) | (0,1) |
+|---|---|---|---|
+| 0.7 | `1.3e−6` | `9` digits | `7` digits |
+| 0.5 | `2.5e−10` | `7.4e−11` | `4.8e−10` |
+| 0.3 | `3.1e−15` | `4.9e−15` | `1.3e−15` |
 
-```
-P(k)/P(0) = exp(−π k² / 2b),    b = K′/K,  k² = 1 − a⁴
-```
+**The content.** The scale `b` and the half-integer shift structure of Theorem
+1.2 are already present in the purely LOCAL gas statistics — on the full plane,
+with no diamond, no frozen boundary and no global constraint. `b` is Theorem
+1.2's own scale, and the shifts 0 and 1/2 are two of Remark 4.18's four
+alignments `{0, 1/4, 1/2, 3/4}`.
 
-**This still closes the factor of 2, and §3.2's table is still a correct
-determination of `b`** — its conditioned path starts at face `(0,0)`, which is
-in the diagonal class, which is why its ratio matches `exp(−π/2b)` to seven
-digits. The route count of five stands. What is withdrawn is the generality: the
-statement is about diagonal-class face pairs, with a universal tail, not about
-"the local fluctuation" tout court.
+**And the diagonal class is genuinely different.** Its difference law is `DG(2b)`
+(verified to `8.2e−14` at `a = 0.5`), but `DG(2b)` admits **no convolution square
+root among probability measures**: its Fourier transform is positive
+(`min = 0.585`) so the square root is real, yet inverting it gives negative
+mass, `−1.82e−3` at `k = ±2`. So the two diagonal-class heights are not
+independent at any separation, even though the law saturates. That is the one
+part of this I cannot account for: in a gas phase correlations decay
+exponentially, so asymptotic independence is what one expects, and the
+diagonal class does not have it.
 
-There are still two discrete Gaussians and the factor of 2 is still the ratio of
-their scales: the discrete component of Theorem 1.2 has scale `b` and shift
-`1/4`; the diagonal-class local fluctuation has scale `2b` and shift `0`.
+**This closes the factor of 2 for good.** §3.2 measures a diagonal-class
+difference, whose law is `DG(2b)` — doubled scale, zero shift — while Theorem
+1.2's discrete component is `DG(b)` with shift `1/4`. Two laws, both built from
+`b`, differing by exactly the factor of 2 in scale. §3.2's table is a correct
+determination of `b`, and the route count of five stands.
 
-*The genus-3 generalisation fails as first guessed.* The natural conjecture —
-facet `i`'s local fluctuation is `DG(2(Im B)_ii)` — was tested by sampling
-configuration A at `n = 96` and gives measured `P(1)/P(0)` of
-`0.271 / 0.122 / 0.138` against predicted `0.084 / 0.152 / 0.086`, off by up to
-3.2×. But the face pairs there were chosen by `x`-extremes within each facet and
-so are of arbitrary classes, which the genus-1 table above shows is exactly what
-the `k = 1` atom is sensitive to. The test must be redone on diagonal-class
-pairs before the conjecture is judged; as it stands it is untested, not refuted.
+*Status: numerics, not a proof.* The route to one is explicit. The
+characteristic function of the height difference across a length-`r` path is the
+Toeplitz determinant `det(I + D(θ) M_r)` with `M` the gas inverse; as `r → ∞`
+the strong Szegő limit theorem gives `G(θ)^r E(θ)`, and saturation forces
+`G(θ) = 1`, leaving the Szegő constant `log E = Σ_{k≥1} k |c_k(θ)|²` over the
+Fourier coefficients of the log-symbol. The claim is that this equals
+`|θ₃(θ/2 | q)/θ₃(0 | q)|²` with `q = e^{−π/b}`. Identifying the symbol
+explicitly from the double contour integral and evaluating that sum is the
+remaining work; it is classical in shape and has not been done here.
 
 *Why §3.6 can see the shift and §3.2 cannot.* Any height difference between two
 faces is symmetry-forced as above, so no such observable can ever reveal the
