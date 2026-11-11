@@ -938,15 +938,52 @@ difference, whose law is `DG(2b)` — doubled scale, zero shift — while Theore
 `b`, differing by exactly the factor of 2 in scale. §3.2's table is a correct
 determination of `b`, and the route count of five stands.
 
-*Status: numerics, not a proof.* The route to one is explicit. The
-characteristic function of the height difference across a length-`r` path is the
-Toeplitz determinant `det(I + D(θ) M_r)` with `M` the gas inverse; as `r → ∞`
-the strong Szegő limit theorem gives `G(θ)^r E(θ)`, and saturation forces
-`G(θ) = 1`, leaving the Szegő constant `log E = Σ_{k≥1} k |c_k(θ)|²` over the
-Fourier coefficients of the log-symbol. The claim is that this equals
-`|θ₃(θ/2 | q)/θ₃(0 | q)|²` with `q = e^{−π/b}`. Identifying the symbol
-explicitly from the double contour integral and evaluating that sum is the
-remaining work; it is classical in shape and has not been done here.
+*Status: half proved, half refuted, and the target restated exactly.*
+
+The characteristic function across a length-`r` path is the Toeplitz determinant
+`det(I + D(θ) M_r)` with `M` the gas inverse. Along a straight path `M` is
+**exactly block-Toeplitz with period 2** (block differences vanish to
+`0.000e+00`), `d₀ = i a` on every crossed edge, and the signs alternate — so the
+symbol `Φ(k; θ)` is `2 × 2`, built from the blocks of `I + D M`.
+
+**Proved (modulo the strong Szegő theorem): the saturation.** The geometric mean
+of `det Φ` is 1 —
+
+| | `θ/2π` = 0.03 | 0.08 | 0.13 | 0.18 | 0.23 |
+|---|---|---|---|---|---|
+| `\|G − 1\|`, `a = 0.7` | `1.1e−13` | `7.9e−13` | `1.2e−12` | `6.3e−13` | `4.9e−14` |
+| `\|G − 1\|`, `a = 0.5` | `4.1e−20` | `2.6e−19` | `1.1e−16` | `1.1e−18` | `1.1e−16` |
+
+so `G(θ) ≡ 1` and the determinant neither grows nor decays in `r`. That is
+exactly the bounded-variance (smooth-phase) property, obtained from the symbol
+rather than observed. `tr Φ − 2` runs 0.035–0.57 at these `θ`, confirming they
+are non-degenerate.
+
+**Refuted: the scalar route.** `E_scalar = exp(Σ_k k c_k c_{−k})` on
+`log det Φ` comes out `1.000000000` at every genuine `θ`, while the true limit
+is not 1. For a genuinely block symbol `det T_L(Φ) ≠ T_L(det Φ)`, so the scalar
+constant carries none of the content. The remaining step needs the matrix
+(Szegő–Widom) constant, i.e. a Wiener–Hopf factorisation of `Φ`.
+
+**A caution recorded.** Evaluating at `θ/2π ∈ {0, 0.25, 0.5}` makes `Φ ≡ I`
+identically (`det − 1` and `tr − 2` both `~1e−32`), because `Δh ∈ 4ℤ` makes `φ`
+periodic with period `π/2` and `D` vanishes there. A first pass read that as
+"the symbol is unipotent"; it is an artifact of the degenerate points, and only
+`θ/2π ∈ (0, 0.25)` is informative.
+
+**The target, stated exactly.** The direct determinant takes the values
+`0.855794564, 0.624350876, 0.624350876, 0.855794564` at
+`θ/2π = 0.05, 0.10, 0.15, 0.20`, which are the theta ratio at `4θ` — the factor
+4 being the height quantum. So what must be shown is
+
+```
+Szego-Widom constant of  Φ(k; θ)   =   θ₃(2θ | q) / θ₃(0 | q),    q = e^{−π/2b}
+```
+
+for the explicit `2 × 2` symbol above. A theta function at the modulus of the
+model's own genus-1 spectral curve is what Riemann–Hilbert analysis of such a
+symbol is expected to produce, so the shape is right; the factorisation has not
+been done here.
 
 *Why §3.6 can see the shift and §3.2 cannot.* Any height difference between two
 faces is symmetry-forced as above, so no such observable can ever reveal the
