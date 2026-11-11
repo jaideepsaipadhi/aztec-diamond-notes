@@ -971,19 +971,45 @@ periodic with period `π/2` and `D` vanishes there. A first pass read that as
 "the symbol is unipotent"; it is an artifact of the degenerate points, and only
 `θ/2π ∈ (0, 0.25)` is informative.
 
-**The target, stated exactly.** The direct determinant takes the values
-`0.855794564, 0.624350876, 0.624350876, 0.855794564` at
-`θ/2π = 0.05, 0.10, 0.15, 0.20`, which are the theta ratio at `4θ` — the factor
-4 being the height quantum. So what must be shown is
+**The symbol's structure, measured.**
+
+* `det Φ(k) ≡ 1` — the symbol is `SL(2,ℂ)`-valued. The residual is path
+  truncation and shrinks with the decay rate: `1.9e−6` at `a = 0.7`, `2.4e−11`
+  at `a = 0.5`. This is the clean form of the `G ≡ 1` statement above
+  (pointwise, not merely in geometric mean), and it is what gives saturation.
+* Both eigenvalues have modulus exactly 1, so `Φ` is in the elliptic conjugacy
+  class with eigenvalues `e^{±iα(k)}`, and `tr Φ ∈ (−2, 2)` throughout
+  (`[1.483, 1.673]` at `a = 0.7`, `θ/2π = 0.10`).
+* The discriminant `T² − 4` stays `≥ 1.2` in modulus on `|z| = 1`: no branch
+  points on the contour, so a Wiener–Hopf factorisation with zero partial
+  indices should exist.
+* The eigenvectors are strongly `k`-dependent (`|1 − |⟨v(0), v(k)⟩||` reaching
+  0.90), so the problem does **not** split into two scalar ones.
+* **`tr Φ(k)` is analytic with all harmonics, not a Laurent polynomial** —
+  `c₁ = 5.0e−3` but `c₂ = 7.4e−3`, `c₃ = 4.2e−3`, and `1.8e−3` beyond. So the
+  spectral curve `λ² − T(z)λ + 1 = 0` is not an algebraic genus-1 curve, and the
+  hoped-for mechanism — that the symbol's own curve is the model's elliptic
+  curve, making the theta function manifestly its theta function — is **dead**.
+
+**The target, stated exactly, with the convention pinned.** The direct
+determinant equals the theta ratio at argument `4θ` (the height quantum), exact
+at every `θ` tested: at `a = 0.5`, `θ/2π = 0.05, 0.08, 0.10, 0.15, 0.20` gives
+`0.922072836, 0.839265025, 0.796100823, 0.796100823, 0.922072836` against
+`θ₃(4θ|q)/θ₃(0|q)` to all nine digits, `q = e^{−π/2b}`. So what must be shown is
 
 ```
-Szego-Widom constant of  Φ(k; θ)   =   θ₃(2θ | q) / θ₃(0 | q),    q = e^{−π/2b}
+Szego-Widom constant of  Φ(k; θ)   =   θ₃(4θ | q) / θ₃(0 | q),   q = e^{−π/2b}
 ```
 
-for the explicit `2 × 2` symbol above. A theta function at the modulus of the
-model's own genus-1 spectral curve is what Riemann–Hilbert analysis of such a
-symbol is expected to produce, so the shape is right; the factorisation has not
-been done here.
+**And an attempt at it failed.** Evaluating Widom's constant as
+`det(T_N(Φ) T_N(Φ^{-1}))` gives `0.704365782` at `a = 0.5`, `θ/2π = 0.08`,
+against the true `0.839265025`. The value is `N`-independent (identical at
+`N = 10, 20, 40`), so it is a stable quantity and not a convergence failure —
+either the operator ordering, the block-index orientation, or the form of the
+constant is wrong. I did not chase it: fixing a formula by trying conventions
+until one matches is how the errors logged in §7.5 were produced. Evaluating
+this constant properly is Riemann–Hilbert work and is the honest hand-off
+point.
 
 *Why §3.6 can see the shift and §3.2 cannot.* Any height difference between two
 faces is symmetry-forced as above, so no such observable can ever reveal the
